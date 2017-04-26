@@ -1,0 +1,539 @@
+{
+	"title": "SFGdb Portal",
+	"description": "SFGdb: Somatic Fusion Genes database detected from paired-end RNA-sequencing TCGA data",
+	"long_description": "SFGdb is a database designed to provide access to predictions and annotations of Somatic Fusion Genes detected from paired-end RNA-sequencing data. Fusion analysis has been performed using the FusionCatcher algorithm on 935 tumor cell lines available on TCGA repository with hg38 as reference genome.",
+	"image": {
+		"src": "logo.png",
+		"percentage_width": "200"
+	},
+	"logos": [
+		{
+			"image": "http://www.procedamus.it/images/CINECA.jpg"
+		},
+		{
+			"image": "logo_negri.png"
+		}
+	],
+	"links": {
+		"statistics_all": "http://localhost/api/fusion/statistics_all/",
+		"statistics_by_chromosome": "http://localhost/api/fusion/get_distribution/Chromosome/Fusion/",
+		"statistics_single_chromosome": "http://localhost/api/fusion/get_single_distribution/Chromosome/",
+		"circos_url": "http://localhost/api/fusion/cell_line/"
+	},
+	"menu": [{
+			"name": "Home",
+			"url": "home"
+		}, {
+			"name": "Search",
+			"items": [{
+				"name": "Search for Cell line",
+				"url": "search_for_cell_line"
+			}, {
+				"name": "Search for Chromosome",
+				"url": "search_for_chromosome"
+			}, {
+				"name": "Search for Gene",
+				"url": "search_for_gene"
+			}, {
+				"name": "Search for Exon",
+				"url": "search_for_exon"
+			}, {
+				"name": "Search for Transcript",
+				"url": "search_for_transcript"
+			}, {
+				"name": "Search for Fusion information",
+				"url": "search_for_fusion"
+			}, {
+				"name": "Search Viruses",
+				"url": "search_for_viruses"
+			}]
+	}, {
+		"name": "Documents & Downloads",
+		"url": "downloads",
+		"action": "http://localhost/api/fusion/download_data/"
+	}, {
+		"name": "Statistics",
+		"url": "statistics"
+	}, {
+		"name": "Contact"
+	}],
+	"pages": [
+		{
+			"title": "main",
+			"elements": [
+				[
+					{
+						"title": "Global summary",
+						"width": "33%",
+						"elements": [
+							{
+								"type": "two-column-table",
+								"data": {
+									"url": "http://localhost/api/fusion/statistics_all/"
+								}
+							}
+						]
+					},
+					{
+						"title": "Fusion events by chromosome",
+						"subtitle": "Distribution of fusion events (y-axis) divided by chromosomes (x-axis)",
+						"width": "33%",
+						"elements": [
+							{
+								"type": "chart-pie",
+								"data": {
+									"url": "http://localhost/api/fusion/get_distribution/Chromosome/Fusion/",
+									"onClick": {
+										"action": "write",
+										"key": "chromosome"
+									}
+								}
+							}
+						],
+						"footer": {
+							"label": "auto",
+							"pluralize": "true",
+							"prefixFunction": "total"
+						}
+					},
+					{
+						"title": "Summary for chromosome",
+						"width": "33%",
+						"elements": [
+							{
+								"type": "table",
+								"data": {
+									"url": "http://localhost/api/fusion/get_single_distribution/Chromosome/CHROMOSOME",
+									"template": "CHROMOSOME",
+									"key": "chromosome",
+									"value": "1"
+								}
+							}
+						],
+						"footer": {
+							"label": "auto",
+							"pluralize": "true",
+							"prefixFunction": "total"
+						}
+					}
+				],
+				[
+					{
+						"width": "100%",
+						"title": "Explore table",
+						"footer": {
+							"label": "auto",
+							"pluralize": "true",
+							"prefixFunction": "total"
+						},
+						"form": [
+							{
+								"fields": [
+									{
+										"label": "Select a sample",
+										"type": "select",
+										"values": "http://localhost/api/fusion/rap/get_list/Data/Sample",
+										"default": "Sample 1",
+										"on-change": [
+											{
+												"action": "write",
+												"key": "sample_id"
+											},
+											{
+												"action": "read",
+												"url": "http://localhost/api/fusion/rap/get_resource/TABLE/SAMPLE_ID",
+												"template": "SAMPLE_ID",
+												"key": "sample_file"										
+											}
+										]
+									}
+								]
+							}
+						],
+						"actions": [
+							{
+								"url": "http://localhost/api/fusion/rap/download/excel/",
+								"label": "Download as Excel",
+								"type": "button",
+								"icon": "fa-file-excel-o",
+								"modifiers": "fa-lg"
+							},
+							{
+								"url": "http://localhost/api/fusion/rap/download/csv/",
+								"label": "Download as CSV",
+								"type": "button",
+								"icon": "fa-table",
+								"modifiers": "fa-lg"
+							}
+						],
+						"elements": [
+							{
+								"type": "paginated-table",
+								"numbered": true,
+								"data": {
+									"url": "http://localhost/api/fusion/explore/SAMPLE_FILE",
+									"template": "SAMPLE_FILE",
+									"key": "sample_file"
+								}
+							}
+						]
+					}
+				]				
+			]
+		},
+		{
+			"title": "statistics",
+			"elements": [
+				[
+					{
+						"title": "Distribution of fusion events across genes",
+						"width": "30%",
+						"elements": [
+							{
+								"type": "table",
+								"data":{
+									"url": "http://localhost/api/fusion/get_distribution/Gene/Fusion/1000/ASC/"
+								}
+							}
+						]
+					},
+					{
+						"title": "Distribution of fusion events across cell lines",
+						"width": "70%",
+						"elements":
+						[
+							{
+								"type": "chart-bar",
+								"data": {
+									"url": "http://localhost/api/fusion/get_distribution/CellLine/Fusion/50/"
+								}
+							}
+						]
+					}
+				],
+				[
+					{
+						"title": "Distribution of fusion events across chromosomes",
+						"width": "30",
+						"elements":[
+							{
+								"type": "chart-pie",
+								"data": {
+									"url": "http://localhost/api/fusion/get_distribution/Chromosome/Fusion/"
+								}
+							}
+						]
+					},
+					{
+						"title": "Distribution of diseases across cell lines",
+						"width": "70%",
+						"elements": [
+							{
+								"type": "chart-bar",
+								"data": {
+									"url": "http://localhost/api/fusion/get_distribution/Disease/CellLine/100/DESC/"
+								}
+							}
+						]
+					}
+				]
+			]
+		}
+	],
+	"forms": [
+		{
+		"name": "search_for_cell_line",
+		"fields": [{
+			"label": "Cell line",
+			"type": "select",
+			"values": "http://localhost/api/fusion/cell_lines/",
+			"placeholder": "CCLE_0384",
+			"default": "CCLE_0384",
+			"required": "true"
+		}],
+		"submit": {
+			"label": "Submit",
+			"url": "http://localhost/api/fusion/cell_line/"
+		}
+	},{
+		"name": "search_for_chromosome",
+		"fields": [{
+			"label": "Cell line",
+			"type": "select",
+			"values": "http://localhost/api/fusion/cell_lines/",
+			"placeholder": "CCLE_0384",
+			"default": "CCLE_0384",
+			"required": "true"
+		}, {
+			"label": "Chromosome",
+			"type": "select",
+			"values": "http://localhost/api/fusion/chromosomes/",
+			"placeholder": "14",
+			"default": "14",
+			"required": "true"
+		}, {
+			"label": "Start position",
+			"type": "number",
+			"placeholder": 24292198,
+			"default": 24292198,
+			"required": "true"
+		}, {
+			"label": "End position",
+			"type": "number",
+			"placeholder": 24320214,
+			"default": 24320214,
+			"required": "true"
+		}],
+		"submit": {
+			"label": "Submit",
+			"url": "http://localhost/api/fusion/chromosomes/"
+		}
+	}, {
+		"name": "search_for_fusion",
+		"fields": [{
+			"label": "Cell line",
+			"type": "select",
+			"values": "http://localhost/api/fusion/cell_lines/",
+			"placeholder": "CCLE_0384",
+			"default": "CCLE_0384",
+			"required": "true"
+		}, {
+			"label": "Mapping algorithm",
+			"type": "select",
+			"values": "http://localhost/api/fusion/mapping_algorithms/",
+			"placeholder": "Any",
+			"required": "true"
+		}, {
+			"label": "Fusion description",
+			"type": "select",
+			"values": "http://localhost/api/fusion/fusion_descriptions",
+			"placeholder": "Any",
+			"required": "true"
+		}, {
+			"label": "Predicted Effects",
+			"type": "select",
+			"values": "http://localhost/api/fusion/predicted_effects",
+			"placeholder": "Any",
+			"required": "true",
+			"form": [{
+				"index": 4,
+				"name": "subform_search_for_fusion",
+				"fields": [{
+					"label": "Predicted effect for 5' end gene",
+					"type": "select",
+					"values": "http://localhost/api/fusion/Predicted_effect_for_end_gene",
+					"placeholder": "Any",
+					"default": "",
+					"value": "2",
+					"required": "true"
+				}, {
+					"label": "Predicted effect for 3' end gene",
+					"type": "select",
+					"values": "http://localhost/api/fusion/Predicted_effect_for_end_gene",
+					"placeholder": "Any",
+					"default": "",
+					"value": "2",
+					"required": "true"
+				}]
+			}]
+		}],
+		"submit": {
+			"label": "Submit",
+			"url": "http://localhost/api/fusion/fusions/"
+		}
+	}, {
+		"name": "search_for_gene",
+		"fields": [{
+			"type": "choice",
+			"subtype": "radio",
+			"group_id": "gene_selection",
+			"required": "true",
+			"values": [{
+				"label": "single gene",
+				"selected": "false"
+			}, {
+				"label": "pair gene",
+				"selected": "false"
+			}],
+			"form": [{
+				"value": "single gene",
+				"name": "subform_search_for_single_gene",
+				"fields": [{
+					"label": "Symbol or EnsembleID (e.g., DHRS1 or ENSG00000157379)",
+					"type": "text",
+					"values": "http://localhost/api/fusion/Search_for_single_gene",
+					"placeholder": "DHRS1 or ENSG00000157379",
+					"required": "true"
+				}, {
+					"label": "Cell line",
+					"type": "select",
+					"values": "http://localhost/api/fusion/cell_lines/",
+					"placeholder": "CCLE_0384",
+					"default": "CCLE_0384",
+					"required": "true"
+				}]
+			}, {
+				"value": "pair gene",
+				"name": "subform_search_for_pair_gene",
+				"fields": [{
+					"label": "Symbol or EnsembleID of first gene (e.g., DHRS1 or ENSG00000157379)",
+					"type": "text",
+					"values": "http://localhost/api/fusion/Search_for_single_gene",
+					"placeholder": "DHRS1 or ENSG00000157379",
+					"required": "true"
+				}, {
+					"label": "Symbol or EnsembleID of second gene (e.g., RABGGTA or ENSG00000100949)",
+					"type": "text",
+					"values": "http://localhost/api/fusion/Search_for_single_gene",
+					"placeholder": "RABGGTA or ENSG00000100949",
+					"required": "true"
+				}, {
+					"label": "Cell line",
+					"type": "select",
+					"values": "http://localhost/api/fusion/cell_lines/",
+					"placeholder": "CCL384",
+					"required": "true"
+				}]
+			}]
+		}],
+		"submit": {
+			"label": "Submit",
+			"url": "http://localhost/api/fusion/genes"
+		}
+	}, {
+		"name": "search_for_exon",
+		"fields": [{
+			"type": "choice",
+			"subtype": "radio",
+			"required": "true",
+			"group_id": "exon_selection",
+			"form": [{
+				"value": "single exon",
+				"name": "subform_search_for_single_exon (e.g., ENSE00001678826)",
+				"fields": [{
+					"label": "Exon EnsembleID",
+					"type": "text",
+					"values": "http://localhost/api/fusion/Search_for_single_gene",
+					"placeholder": "ENSE00001678826",
+					"required": "true"
+				}, {
+					"label": "Cell line",
+					"type": "select",
+					"values": "http://localhost/api/fusion/cell_lines/",
+					"placeholder": "CCLE_0384",
+					"required": "true"
+				}]
+			}, {
+				"value": "pair exon",
+				"name": "subform_search_for_pair_exon",
+				"fields": [{
+					"label": "Exon EnsembleID of first exon (e.g., ENSE00001678826)",
+					"type": "text",
+					"values": "http://localhost/api/fusion/Search_for_single_gene",
+					"placeholder": "ENSE00001678826",
+					"required": "true"
+				}, {
+					"label": "Exon EnsembleID of second exon (e.g., ENSE00000991541)",
+					"type": "text",
+					"values": "http://localhost/api/fusion/Search_for_single_gene",
+					"placeholder": "ENSE00000991541",
+					"required": "true"
+				}, {
+					"label": "Cell line",
+					"type": "select",
+					"values": "http://localhost/api/fusion/cell_lines/",
+					"placeholder": "CCLE_0384",
+					"required": "true"
+				}]
+			}],
+			"values": [{
+				"label": "single exon",
+				"selected": "false"
+			}, {
+				"label": "pair exon",
+				"selected": "false"
+			}]
+		}],
+		"submit": {
+			"label": "Submit",
+			"url": "http://localhost/api/fusion/exons"
+		}
+	}, {
+		"name": "search_for_transcript",
+		"fields": [{
+			"type": "choice",
+			"subtype": "radio",
+			"required": "true",
+			"group_id": "transcript_selection",
+			"form": [{
+				"value": "single transcript",
+				"name": "subform_search_for_single_transcript",
+				"fields": [{
+					"label": "Transcript EnsembleID (e.g., ENST00000371998)",
+					"type": "text",
+					"values": "http://localhost/api/fusion/Search_for_single_transcript",
+					"placeholder": "ENST00000371998",
+					"required": "true"
+				}, {
+					"label": "Cell line",
+					"type": "select",
+					"values": "http://localhost/api/fusion/cell_lines/",
+					"placeholder": "CCLE_0384",
+					"required": "true"
+				}]
+			}, {
+				"value": "pair transcript",
+				"name": "subform_search_for_pair_transcript",
+				"fields": [{
+					"label": "Transcript EnsembleID of first transcript (e.g., ENST00000371998)",
+					"type": "text",
+					"values": "http://localhost/api/fusion/Search_for_single_gene",
+					"placeholder": "ENST00000371998",
+					"required": "true"
+				}, {
+					"label": "Transcript EnsembleID of second transcript (e.g., ENST00000302326)",
+					"type": "text",
+					"values": "http://localhost/api/fusion/Search_for_single_gene",
+					"placeholder": "ENST00000302326",
+					"required": "true"
+				}, {
+					"label": "Cell line",
+					"type": "select",
+					"values": "http://localhost/api/fusion/cell_lines/",
+					"placeholder": "CCLE_0384",
+					"required": "true"
+				}]
+			}],
+			"values": [{
+				"label": "single transcript",
+				"selected": "false"
+			}, {
+				"label": "pair transcript",
+				"selected": "false"
+			}]
+		}],
+		"submit": {
+			"label": "Submit",
+			"url": "http://localhost/api/fusion/transcript"
+		}
+	},{
+		"name": "search_for_viruses",
+		"fields": [{
+			"label": "Virus name, GI id or NC ID (e.g., 9626958 or NC_001501.1)",
+			"type": "text",
+			"values": "http://localhost/api/fusion/Search_for_viruses",
+			"placeholder": "Moloney murine leukemia virus, complete genome, 9626958 or NC_001501.1",
+			"required": "true"
+		}, {
+			"label": "Cell line",
+			"type": "select",
+			"values": "http://localhost/api/fusion/cell_lines/",
+			"placeholder": "CCLE_0384",
+			"required": "true"
+		}],
+		"submit": {
+			"label": "Submit",
+			"url": "http://localhost/api/fusion/chromosomes/"
+		}
+	}]
+}

@@ -1,0 +1,118 @@
+<div ng-if="type == 'table'" style="max-height: 300px; overflow: auto;">
+
+<!-- 	<div style="background-color: green; width: 200px; height: 200px;" ng-click="myClick()"></div> -->
+
+	<table md-table md-row-select multiple>
+		<tbody md-body>
+			<thead md-head>
+				<tr md-row>
+					<th md-column ng-repeat="label in subdata.header"><span>{{label}}</span></th>
+				</tr>
+			</thead>
+			<tr md-row md-auto-select ng-repeat="item in subdata.items track by $index">
+				<td md-cell style="text-align: right;"><span>{{item}}</span></td>
+			</tr>
+		</tbody>
+		
+	 </table>
+
+<!-- 	<table md-table md-row-select multiple> -->
+<!-- 		<tbody md-body> -->
+<!-- 			<thead md-head> -->
+<!-- 				<tr md-row> -->
+<!-- 					<th md-column ng-repeat="label in subdata.labels"><span>{{label}}</span></th> -->
+<!-- 				</tr> -->
+<!-- 			</thead> -->
+<!-- 			<tr md-row md-auto-select ng-repeat="label in subdata.header track by $index"> -->
+<!-- 				<td md-cell style="font-weight: bold;"><span>{{label}}</span></td> -->
+<!-- 				<td md-cell style="text-align: right;"><span>{{subdata.items[$index]}}</span></td> -->
+<!-- 			</tr> -->
+<!-- 		</tbody> -->
+		
+<!-- 	 </table> -->
+</div>
+
+<div ng-if="type == 'two-column-table'" style="max-height: 300px; overflow: auto;">
+	<table md-table md-row-select multiple>
+		<tbody md-body>
+			<thead md-head>
+				<tr md-row>
+					<th md-column ng-repeat="label in subdata.labels"><span>{{label}}</span></th>
+				</tr>
+			</thead>
+			<tr md-row md-auto-select ng-repeat="label in subdata.header track by $index">
+				<td md-cell style="font-weight: bold;"><span>{{label}}</span></td>
+				<td md-cell style="text-align: right;"><span>{{subdata.items[0][$index]}}</span></td>
+			</tr>
+		</tbody>
+	 </table>
+</div>
+
+<div ng-if="type == 'list'" style="max-height: 300px; overflow: auto;">
+	<table md-table md-row-select multiple>
+		<tbody md-body>
+			<tr md-row md-auto-select ng-repeat="item in subdata.items track by $index">
+				<td md-cell style="font-weight: bold;"><span>{{($index+1) + '.'}}</span></td>
+				<td md-cell><span>{{item}}</span></td>
+				<td ng-if="module_info.info" md-cell>
+					<md-button class="md-primary md-raised" style="text-decoration: none;" ng-href="{{module_info.info + 'http://localhost/rnaseq/data/bams/' + item}}">
+								<span class="fa fa-bar-chart fa-lg"></span>
+								<span style="">See stats</span>
+					</md-button>
+				</td>
+				<td ng-if="module_info.explore" md-cell>
+					<md-button class="md-primary md-raised" style="text-decoration: none;" ng-href="{{module_info.explore + 'http://localhost/rnaseq/data/bams/' + item}}">
+								<span class="fa fa-braille fa-lg"></span>
+								<span style="">See file</span>
+					</md-button>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+</div>
+
+<div>
+	<canvas ng-if="type == 'chart-pie'"
+		class="chart chart-pie"
+		chart-data="subdata.items"
+		chart-labels="subdata.header"
+		chart-click="onClick"
+		>
+	</canvas>
+</div>
+
+<div>
+	<canvas ng-if="type == 'chart-bar'" class="chart chart-bar" chart-data="subdata.items" chart-labels="subdata.header">
+	</canvas>
+<div>
+
+<div ng-if="type == 'paginated-table'">
+	<md-table-container>
+	  <table md-table ng-model="selected" md-progress="promise">
+	    <thead md-head>
+	      <th md-column style="text-align: center; padding-bottom:20px;">
+	      Line no.
+	      </th>
+	      <th md-column style="text-align: center; padding-bottom:20px;" ng-repeat="col in subdata.header">
+	      	<span>{{col}}</span>
+	      </th>
+	    </thead>
+	    <tbody md-body>
+	      <tr md-row md-auto-select ng-repeat="row in subdata.items track by $index">
+	        <td md-cell style="text-align: center; padding: 20px;"><b>{{(query.page-1)*query.limit + $index +1}}</b></td>
+			<td md-cell style="text-align: center;" ng-repeat="field in row track by $index">
+				<span ng-if="!field.url">{{field}}</span>
+			</td>
+		  </tr>
+	    </tbody>
+	  </table>
+	</md-table-container>
+	<md-table-pagination
+		md-limit="query.limit"
+		md-limit-options="[5, 10, 15]"
+		md-page="query.page"
+		md-on-paginate="update_table"
+		md-total="{{query.total}}"
+		md-page-select>
+	</md-table-pagination>
+</div>

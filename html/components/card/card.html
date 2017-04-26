@@ -1,0 +1,41 @@
+<md-card>
+	<md-card-title>
+		<md-card-title-text>
+	            <span class="md-headline" ng-if="title" ng-bind="title"></span>
+	            <span class="md-subhead" ng-if="subtitle" ng-bind="subtitle"></span>
+	    </md-card-title-text>		
+	</md-card-title>
+	
+	<md-card-content>
+	
+		<div ng-if="sending" style="text-align: center; color: cadetblue;">
+     		<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i>
+ 		</div>
+ 		
+<!--  		<md-input-container style="min-width: 30%;"> -->
+<!--  				<label>Select</label> -->
+<!--    			<md-select -->
+<!--    				ng-model="option_value" -->
+<!--    				ng-change="update_value(option_value)" -->
+<!--    				> -->
+<!--    				<md-option ng-value="n" ng-repeat="n in range(1, 30)">Sample {{n}}</md-option> -->
+<!-- 			</md-select> -->
+<!-- 		</md-input-container> -->
+		
+		<div ng-if="actions" style="display: inline-block; width: auto; float: right;">
+			<action ng-controller="buttonController" ng-init="init(action)" ng-repeat="action in actions">
+			</action>
+		</div>
+		
+		<element ng-repeat="element in elements" ng-controller="elementController" ng-init="init(element)">
+		</element>
+
+	</md-card-content>
+	
+	<md-divider ng-if="footer"></md-divider>
+	
+	<md-card-footer ng-if="footer">
+		<span ng-bind="footerFunction(footer.prefixFunction)"></span>
+		<span style="display: inline-block;" ng-if="footer.label != 'auto'" ng-bind="footer.label"></span><span style="display: inline-block;" ng-if="footer.label == 'auto'" ng-bind="footer.header[0]"></span><span style="display: inline-block;" ng-if="footer.pluralize && elements[0].data.length > 0">s</span>
+	</md-card-footer>
+</md-card>

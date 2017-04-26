@@ -1,0 +1,64 @@
+<section style="padding: 0% 5% 0% 5%;">
+	<p ng-bind-html="ctrl.info.long_description"></p>
+		
+	<form ng-submit="ctrl.send_query()">
+	
+		<div ng-repeat="field in ctrl.form.fields track by $index">
+			<md-input-container class="md-input-has-placeholder">
+				<label style="min-width: 400px;" ng-if="field.type != 'checkbox'" ng-bind="field.label"></label>
+				
+				<input ng-if="field.type != 'choice' && field.type != 'select' && field.type != 'checkbox'" placeholder="{{field.placeholder}}" ng-model="field.value" ng-value="{{field.default}}" type="{{field.type}}"/>
+				
+				<md-select ng-model="field.value" ng-if="field.type == 'select' && (!field.multiple || field.multiple == false)" ng-model-options="{trackBy: '$value.id'}">
+					<md-option ng-value="value" ng-repeat="value in field.values track by $index">{{value}}</md-option>
+				</md-select>
+				
+				<md-select multiple ng-model="field.value" ng-if="field.type == 'select' && field.multiple && field.multiple == true" ng-model-options="{trackBy: '$value.id'}">
+					<md-option ng-value="value" ng-repeat="value in field.values track by $index">{{value}}</md-option>
+				</md-select>
+				
+				<md-checkbox ng-if="field.type == 'checkbox'" ng-model="field.value" ng-checked="{{field.checked}}">
+					{{field.label}}
+				</md-checkbox>
+			</md-input-container>
+			
+			<md-radio-group>
+				<md-radio-button ng-click="ctrl.load_form(field, value)" ng-if="field.type == 'choice' && field.subtype == 'radio'" ng-repeat="value in field.values track by $index" name="{{field.group_id}}" ng-model="field.value" ng-checked="{{value.selected}}" ng-value="value.label" type="radio" aria-label="Multi-choice">
+					{{value.label}}
+				</md-radio-button>
+				
+			</md-radio-group>
+		</div>
+		<md-button ng-click="ctrl.send_query()" class="md-primary md-raised">{{ctrl.form.submit.label}}</md-button>
+<!-- 		<input type="submit" ng-value="ctrl.form.submit.label"> -->
+	</form>
+</section>
+
+<section style="padding: 0% 5% 0% 5%;">
+	<div ng-if="ctrl.sending" style="text-align: center; color: cadetblue;">
+        	<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i>
+    </div>
+
+	<md-card ng-if="ctrl.form_results.items" class="full-card">
+		<md-card-title style="text-align: center;">
+			<span>{{ctrl.form_results.items.length}}</span>
+			<span>&nbsp;results</span>
+		</md-card-title>
+		<md-card-content>
+			<table md-table md-row-select multiple>
+				<thead style="display:table;" md-head>
+		        	<tr md-row>
+		            	<th md-column ng-repeat="col in ctrl.form_results.header track by $index"><span>{{col}}</span></th>
+					</tr>
+				</thead>
+				<tbody style="max-height: 500px; display: block; overflow-y: scroll;" md-body>
+			        <tr ng-if="!ctrl.sending" md-row md-auto-select ng-repeat="row in ctrl.form_results.items track by $index">
+			        	<td md-cell ng-repeat="field in row track by $index" style="max-width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+							<span>{{field}}</span>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</md-card-content>
+	</md-card>	
+</section>

@@ -1,0 +1,6 @@
+<a ng-if="type == 'text'" ng-href="{{url}}" ng-bind="label"></a>
+
+<md-button ng-if="type == 'button'" class="md-primary md-raised" style="text-decoration: none;" ng-href="{{url}}">
+	<span ng-class="" class="fa {{icon}} {{size}}"></span>
+	<span ng-bind="label"></span>
+</md-button>
