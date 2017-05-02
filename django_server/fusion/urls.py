@@ -17,17 +17,24 @@ from django.conf.urls import url
 from fusion import views
 
 urlpatterns = [
-    url(r'^chromosomes/(.+)/(.+)/', views.search_for_chromosome, name='search_for_chromosome'),
+#     url(r'^chromosomes/(.+)/(.+)/', views.search_for_chromosome, name='search_for_chromosome'),
 #     url(r'^chromosomes/(.+)/(.+)/(.+)/(.+)/', views.search_for_chromosome, name='search_for_chromosome'),
+    url(r'^chromosomes/(.+)/(.+)/(.+)/', views.search_for_chromosome, name='search_for_chromosome'),
+    url(r'^chromosomes/', views.chromosomes, name='chromosomes'),
     url(r'^cell_line/(.+)/', views.search_for_cell_line, name='search_for_cell_line'),
     url(r'^gene/(.+)/(.+)/(.+)/', views.search_for_gene, name='search_for_gene'),
 #     url(r'^genes/(.+)/(.+)/(.+)/', views.search_for_pair_gene, name='search_for_pair_gene'),
 #     url(r'^genes/(.+)/(.+)/', views.search_for_single_gene, name='search_for_single_gene'),
 #     url(r'^genes/(.+)/', views.search_for_single_gene, name='search_for_single_gene'),
-    url(r'^exon/single/(.+)/(.+)/', views.search_for_single_exon, name='search_for_single_exon'),
-    url(r'^exon/pair/(.+)/(.+)/(.+)/', views.search_for_pair_exon, name='search_for_pair_exon'),
-    url(r'^transcript/single/(.+)/(.+)/', views.search_for_single_transcript, name='search_for_single_transcript'),
-    url(r'^transcript/pair/(.+)/(.+)/(.+)/', views.search_for_pair_transcript, name='search_for_pair_transcript'),
+#     url(r'^exon/single/(.+)/(.+)/', views.search_for_single_exon, name='search_for_single_exon'),
+#     url(r'^exon/pair/(.+)/(.+)/(.+)/', views.search_for_pair_exon, name='search_for_pair_exon'),
+    url(r'^exon/(.+)/(.+)/(.+)/', views.search_for_exon, name='search_for_exon'),
+#     url(r'^transcript/single/(.+)/(.+)/', views.search_for_single_transcript, name='search_for_single_transcript'),
+#     url(r'^transcript/pair/(.+)/(.+)/(.+)/', views.search_for_pair_transcript, name='search_for_pair_transcript'),
+    url(r'^transcript/(.+)/(.+)/(.+)/', views.search_for_transcript, name='search_for_transcript'),
+    url(r'^disease/(.+)/', views.search_for_disease, name='search_for_disease'),
+    url(r'^virus/(.+)/(.+)/', views.search_viruses, name='search_viruses'),
+    url(r'^virus/', views.viruses, name='viruses'),
     url(r'^fusion_information/(.+)/(.+)/(.+)/(.+)/(.+)/', views.search_for_fusion_information, name='search_for_fusion_information'),
     url(r'^statistics_all/', views.statistics_all, name='statistics_all'),
     url(r'^statistics_by_chromosome/(.+)/', views.statistics_by_chromosome, name='statistics_by_chromosome'),
@@ -46,5 +53,5 @@ urlpatterns = [
     url(r'^show_info/(.+)', views.show_info, name='show_info'),
     url(r'^fusioncatcher/(.+)/', views.build_fc_table, name='build_fc_table'),
     url(r'^ericscript/(.+)/', views.build_es_table, name='build_es_table'),
-    url(r'^tophat/(.+)/', views.build_th_table, name='build_th_table'),
+    url(r'^tophat/(.+)/', views.build_th_table, name='build_th_table')
 ]

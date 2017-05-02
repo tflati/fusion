@@ -7,20 +7,6 @@
 	<md-card>
 		<md-card-title style="text-align: center;">Global summary</md-card-title>
 		<md-card-content>
-			<!-- 
-			<table md-table md-row-select multiple>
-				<thead md-head>
-					<tr md-row>
-						<th md-column style="text-align: center;" ng-repeat="col in data.header"><span>{{col}}</span></th>
-					</tr>
-				</thead>
-				<tbody md-body>
-					<tr md-row md-auto-select ng-repeat="row in data.items">
-						<td md-cell style="text-align: center;" ng-repeat="field in row"><span>{{field}}</span></td>
-					</tr>
-				</tbody>
-		    </table>
-		    -->
 		    
 		    <table md-table md-row-select multiple>
 				<tbody md-body>
@@ -78,7 +64,7 @@
 
 	<md-card class="full-card full-card-header">
 		<md-card-title style="text-align: center;">{{ctrl.circos.events[2].length}} fusion events for cell line &nbsp;
-			<md-select style="margin: 0px;" ng-change="ctrl.show_circos('http://localhost/api/cell_line/' + ctrl.circos.value + '/')" ng-init="ctrl.load_circos('http://localhost/api/cell_lines/')" ng-model="ctrl.circos.value" ng-model-options="{trackBy: '$value.id'}">
+			<md-select style="margin: 0px;" ng-change="ctrl.show_circos('http://localhost/api/fusion/cell_line/' + ctrl.circos.value + '/')" ng-init="ctrl.load_circos('http://localhost/api/fusion/cell_lines/')" ng-model="ctrl.circos.value" ng-model-options="{trackBy: '$value.id'}">
 				<md-option ng-value="value" ng-repeat="value in ctrl.circos.values track by $index">{{value}}</md-option>
 			</md-select>
 		</md-card-title>

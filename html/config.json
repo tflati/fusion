@@ -257,31 +257,25 @@
 		}
 	},{
 		"name": "search_for_chromosome",
-		"fields": [{
+		"fields": [
+		{
+			"label": "Chromosome 1",
+			"type": "select",
+			"values": "http://localhost/api/fusion/chromosomes/",
+			"required": "true"
+		},
+		{
+			"label": "Chromosome 2",
+			"type": "select",
+			"values": "http://localhost/api/fusion/chromosomes/",
+			"required": "true"
+		},
+		{
 			"label": "Cell line",
 			"type": "select",
 			"values": "http://localhost/api/fusion/cell_lines/",
 			"placeholder": "CCLE_0384",
 			"default": "CCLE_0384",
-			"required": "true"
-		}, {
-			"label": "Chromosome",
-			"type": "select",
-			"values": "http://localhost/api/fusion/chromosomes/",
-			"placeholder": "14",
-			"default": "14",
-			"required": "true"
-		}, {
-			"label": "Start position",
-			"type": "number",
-			"placeholder": 24292198,
-			"default": 24292198,
-			"required": "true"
-		}, {
-			"label": "End position",
-			"type": "number",
-			"placeholder": 24320214,
-			"default": 24320214,
 			"required": "true"
 		}],
 		"submit": {
@@ -344,116 +338,50 @@
 	}, {
 		"name": "search_for_gene",
 		"fields": [{
-			"type": "choice",
-			"subtype": "radio",
-			"group_id": "gene_selection",
-			"required": "true",
-			"values": [{
-				"label": "single gene",
-				"selected": "false"
-			}, {
-				"label": "pair gene",
-				"selected": "false"
-			}],
-			"form": [{
-				"value": "single gene",
-				"name": "subform_search_for_single_gene",
-				"fields": [{
-					"label": "Symbol or EnsembleID (e.g., DHRS1 or ENSG00000157379)",
-					"type": "text",
-					"values": "http://localhost/api/fusion/Search_for_single_gene",
-					"placeholder": "DHRS1 or ENSG00000157379",
-					"required": "true"
-				}, {
-					"label": "Cell line",
-					"type": "select",
-					"values": "http://localhost/api/fusion/cell_lines/",
-					"placeholder": "CCLE_0384",
-					"default": "CCLE_0384",
-					"required": "true"
-				}]
-			}, {
-				"value": "pair gene",
-				"name": "subform_search_for_pair_gene",
-				"fields": [{
-					"label": "Symbol or EnsembleID of first gene (e.g., DHRS1 or ENSG00000157379)",
-					"type": "text",
-					"values": "http://localhost/api/fusion/Search_for_single_gene",
-					"placeholder": "DHRS1 or ENSG00000157379",
-					"required": "true"
-				}, {
-					"label": "Symbol or EnsembleID of second gene (e.g., RABGGTA or ENSG00000100949)",
-					"type": "text",
-					"values": "http://localhost/api/fusion/Search_for_single_gene",
-					"placeholder": "RABGGTA or ENSG00000100949",
-					"required": "true"
-				}, {
-					"label": "Cell line",
-					"type": "select",
-					"values": "http://localhost/api/fusion/cell_lines/",
-					"placeholder": "CCL384",
-					"required": "true"
-				}]
-			}]
-		}],
+                        "label": "Symbol or EnsembleID of first gene (e.g., DHRS1 or ENSG00000157379)",
+                        "type": "text",
+                        "values": "http://localhost/api/fusion/Search_for_single_gene",
+                        "placeholder": "DHRS1 or ENSG00000157379",
+                        "required": "true"
+                }, {
+                            "label": "Symbol or EnsembleID of second gene (e.g., RABGGTA or ENSG00000100949)",
+                            "type": "text",
+                            "values": "http://localhost/api/fusion/Search_for_single_gene",
+                            "placeholder": "RABGGTA or ENSG00000100949",
+                            "required": "true"
+                }, {
+                        "label": "Cell line",
+                        "type": "select",
+                        "values": "http://localhost/api/fusion/cell_lines/",
+                        "placeholder": "CCLE_0384",
+                        "default": "CCLE_0384",
+                        "required": "true"
+                }],
 		"submit": {
 			"label": "Submit",
-			"url": "http://localhost/api/fusion/genes"
+			"url": "http://localhost/api/fusion/gene"
 		}
 	}, {
 		"name": "search_for_exon",
 		"fields": [{
-			"type": "choice",
-			"subtype": "radio",
-			"required": "true",
-			"group_id": "exon_selection",
-			"form": [{
-				"value": "single exon",
-				"name": "subform_search_for_single_exon (e.g., ENSE00001678826)",
-				"fields": [{
-					"label": "Exon EnsembleID",
-					"type": "text",
-					"values": "http://localhost/api/fusion/Search_for_single_gene",
-					"placeholder": "ENSE00001678826",
-					"required": "true"
-				}, {
-					"label": "Cell line",
-					"type": "select",
-					"values": "http://localhost/api/fusion/cell_lines/",
-					"placeholder": "CCLE_0384",
-					"required": "true"
-				}]
-			}, {
-				"value": "pair exon",
-				"name": "subform_search_for_pair_exon",
-				"fields": [{
-					"label": "Exon EnsembleID of first exon (e.g., ENSE00001678826)",
-					"type": "text",
-					"values": "http://localhost/api/fusion/Search_for_single_gene",
-					"placeholder": "ENSE00001678826",
-					"required": "true"
-				}, {
-					"label": "Exon EnsembleID of second exon (e.g., ENSE00000991541)",
-					"type": "text",
-					"values": "http://localhost/api/fusion/Search_for_single_gene",
-					"placeholder": "ENSE00000991541",
-					"required": "true"
-				}, {
-					"label": "Cell line",
-					"type": "select",
-					"values": "http://localhost/api/fusion/cell_lines/",
-					"placeholder": "CCLE_0384",
-					"required": "true"
-				}]
-			}],
-			"values": [{
-				"label": "single exon",
-				"selected": "false"
-			}, {
-				"label": "pair exon",
-				"selected": "false"
-			}]
-		}],
+                        "label": "Exon EnsembleID of first exon (e.g., ENSE00001678826)",
+                        "type": "text",
+                        "values": "http://localhost/api/fusion/Search_for_single_gene",
+                        "placeholder": "ENSE00001678826",
+                        "required": "true"
+                }, {
+                        "label": "Exon EnsembleID of second exon (e.g., ENSE00000991541)",
+                        "type": "text",
+                        "values": "http://localhost/api/fusion/Search_for_single_gene",
+                        "placeholder": "ENSE00000991541",
+                        "required": "true"
+                }, {
+                        "label": "Cell line",
+                        "type": "select",
+                        "values": "http://localhost/api/fusion/cell_lines/",
+                        "placeholder": "CCLE_0384",
+                        "required": "true"
+                }],
 		"submit": {
 			"label": "Submit",
 			"url": "http://localhost/api/fusion/exons"
@@ -461,57 +389,24 @@
 	}, {
 		"name": "search_for_transcript",
 		"fields": [{
-			"type": "choice",
-			"subtype": "radio",
-			"required": "true",
-			"group_id": "transcript_selection",
-			"form": [{
-				"value": "single transcript",
-				"name": "subform_search_for_single_transcript",
-				"fields": [{
-					"label": "Transcript EnsembleID (e.g., ENST00000371998)",
-					"type": "text",
-					"values": "http://localhost/api/fusion/Search_for_single_transcript",
-					"placeholder": "ENST00000371998",
-					"required": "true"
-				}, {
-					"label": "Cell line",
-					"type": "select",
-					"values": "http://localhost/api/fusion/cell_lines/",
-					"placeholder": "CCLE_0384",
-					"required": "true"
-				}]
-			}, {
-				"value": "pair transcript",
-				"name": "subform_search_for_pair_transcript",
-				"fields": [{
-					"label": "Transcript EnsembleID of first transcript (e.g., ENST00000371998)",
-					"type": "text",
-					"values": "http://localhost/api/fusion/Search_for_single_gene",
-					"placeholder": "ENST00000371998",
-					"required": "true"
-				}, {
-					"label": "Transcript EnsembleID of second transcript (e.g., ENST00000302326)",
-					"type": "text",
-					"values": "http://localhost/api/fusion/Search_for_single_gene",
-					"placeholder": "ENST00000302326",
-					"required": "true"
-				}, {
-					"label": "Cell line",
-					"type": "select",
-					"values": "http://localhost/api/fusion/cell_lines/",
-					"placeholder": "CCLE_0384",
-					"required": "true"
-				}]
-			}],
-			"values": [{
-				"label": "single transcript",
-				"selected": "false"
-			}, {
-				"label": "pair transcript",
-				"selected": "false"
-			}]
-		}],
+                        "label": "Transcript EnsembleID of first transcript (e.g., ENST00000371998)",
+                        "type": "text",
+                        "values": "http://localhost/api/fusion/Search_for_single_gene",
+                        "placeholder": "ENST00000371998",
+                        "required": "true"
+                }, {
+                        "label": "Transcript EnsembleID of second transcript (e.g., ENST00000302326)",
+                        "type": "text",
+                        "values": "http://localhost/api/fusion/Search_for_single_gene",
+                        "placeholder": "ENST00000302326",
+                        "required": "true"
+                }, {
+                        "label": "Cell line",
+                        "type": "select",
+                        "values": "http://localhost/api/fusion/cell_lines/",
+                        "placeholder": "CCLE_0384",
+                        "required": "true"
+                }],
 		"submit": {
 			"label": "Submit",
 			"url": "http://localhost/api/fusion/transcript"
@@ -520,8 +415,8 @@
 		"name": "search_for_viruses",
 		"fields": [{
 			"label": "Virus name, GI id or NC ID (e.g., 9626958 or NC_001501.1)",
-			"type": "text",
-			"values": "http://localhost/api/fusion/Search_for_viruses",
+			"type": "select",
+			"values": "http://localhost/api/fusion/virus/",
 			"placeholder": "Moloney murine leukemia virus, complete genome, 9626958 or NC_001501.1",
 			"required": "true"
 		}, {
@@ -533,7 +428,7 @@
 		}],
 		"submit": {
 			"label": "Submit",
-			"url": "http://localhost/api/fusion/chromosomes/"
+			"url": "http://localhost/api/fusion/virus"
 		}
 	}]
 }

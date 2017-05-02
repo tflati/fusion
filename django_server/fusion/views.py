@@ -1,4 +1,4 @@
-from fusion.models import Gene, Chromosome, CellLine, Fusion
+from fusion.models import Gene, Chromosome, CellLine, Fusion, Virus
 import json
 import os
 import csv
@@ -24,13 +24,6 @@ def print_file(request):
 
 def chromosomes(request):
     return HttpResponse(json.dumps(open(os.path.dirname(__file__) + "/" + "chromosomes.txt").read().splitlines()))
-
-# def cell_lines(request):
-#     response = []
-#     for cell_line in CellLine.nodes.all():
-#         response.append(cell_line.cell_line)
-#         
-#     return HttpResponse(json.dumps(response))
 
 def search_indels_by_region(request, chromosome, start, end):
     
@@ -97,7 +90,7 @@ def show_info(request, filename):
 #     
 #     return HttpResponse(json.dumps(response))
 
-def search_for_cell_line(request, c_line):
+def search_for_cell_line(request,c_line):
     response = {}
     header = get_header()
     #get_cell_line_from_disease("Colon adenocarcinoma")    
@@ -139,33 +132,47 @@ def search_for_cell_line(request, c_line):
 #     response['rows'] = {"header": header, "items": rows}
 #     return HttpResponse(json.dumps(response))
 
-def search_for_chromosome(request, c_line, chromos):
+def search_for_chromosome(request,chromos1,chromos2,c_line):
     response = {}
     header = get_header()
     
     # recupero fusioni nella linea cellulare
     fusions = []
-    #se ho specificato solo il cromosoma, cerco tutte le fusioni in tutte le linee cellulari che coinvolgono il cromosoma
-    if c_line == "ALL" and chromos != "ALL":
-        c = Chromosome.nodes.get(chromosome = chromos)
+    #TUTTE LE LINEE CELLULARI, UN CROMOSOMA 
+    if c_line == "ALL" and chromos1 != "ALL" and chromos2 == "ALL" :
+        c = Chromosome.nodes.get(chromosome = chromos1)
         for fusion in c.fromFusiontoChromosome:
             fusions.append(fusion)
-    #se ho specificato solo la linea cellulare, cerco tutte le fusioni che avvengono in uqella linea cellulare nel determinato intervallo
-    elif c_line != "ALL" and chromos == "ALL":
+    #TUTTE LE LINEE CELLULARI, ENTRAMBI I CROMOSOMI
+    elif c_line == "ALL" and chromos1 != "ALL" and chromos2 != "ALL":
+        c1 = Chromosome.nodes.get(chromosome = chromos1)
+        c2 = Chromosome.nodes.get(chromosome = chromos2)
+        for fusion in c1.fromFusiontoChromosome:
+            if c2 in fusion.at_chromosome:
+                fusions.append(fusion)
+        for fusion in c2.fromFusiontoChromosome:
+            if c1 in fusion.at_chromosome:
+                fusions.append(fusion)
+    #LINEA CELLULARE SPECIFICATA, UN CROMOSOMA
+    elif c_line != "ALL" and chromos1 != "ALL" and chromos2 == "ALL":
         for fusion in CellLine.nodes.get(cell_line = c_line).happen:
-            fusions.append(fusion)
-    #se ho sia linea cellulare che cromosoma specificati, cerco tutte le fusioni nella linea cellulare che coinvolgono il cromosoma
-    elif c_line != "ALL" and chromos != "ALL":
+            if fusion.at_chromosome.filter(chromosome__exact=chromos1):
+                fusions.append(fusion)
+    #LINEA CELLULARE SPECIFICATA, ENTRAMBI I CROMOSOMI SPECIFICATI
+    elif c_line != "ALL" and chromos1 != "ALL" and chromos2 != "ALL":
+        c1 = Chromosome.nodes.get(chromosome = chromos1)
+        c2 = Chromosome.nodes.get(chromosome = chromos2)
         for fusion in CellLine.nodes.get(cell_line = c_line).happen:
-            if fusion.at_chromosome.filter(chromosome__exact=chromos):
+            if c1 in fusion.at_chromosome and c2 in fusion.at_chromosome:
                 fusions.append(fusion)
     
+                    
     rows = build_rows(fusions)
     #print(rows)
     response['rows'] = {"header": header, "items": rows}
     return HttpResponse(json.dumps(response))
 
-def search_for_gene(request,c_line,gene_one,gene_two):
+def search_for_gene(request,gene_one,gene_two,c_line):
     response = {}
     header = get_header()
     
@@ -259,121 +266,217 @@ def search_for_gene(request,c_line,gene_one,gene_two):
     response['rows'] = {"header": header, "items": rows}
     return HttpResponse(json.dumps(response))
 
-def search_for_single_gene(request, gene_one, c_line):
+# def search_for_single_gene(request, gene_one, c_line):
+#     response = {}
+#     header = get_header()
+#     
+#     # recupero fusioni nella linea cellulare
+#     fusions = []
+# 
+#     if c_line == "ALL":
+#         for fusion in Gene.nodes.get(symbol = gene_one).had:
+# #             print(fusion)
+#             fusions.append(fusion)
+#     else:
+#         for fusion in CellLine.nodes.get(cell_line = c_line).happen:
+#             if fusion.fromGeneToFusion.filter(symbol__exact=gene_one) or fusion.fromGeneToFusion.filter(gene_id__exact=gene_one) or fusion.with_gene.filter(symbol__exact=gene_one) or fusion.with_gene.filter(gene_id__exact=gene_one):
+#                 fusions.append(fusion)
+#             
+#     rows = build_rows(fusions)
+# #     print(rows)
+# 
+#     response['rows'] = {"header": header, "items": rows}
+#     return HttpResponse(json.dumps(response))
+# 
+# def search_for_pair_gene(request, gene_one, gene_two, c_line):
+#     print("search for pair gene")
+#     response = {}
+#     header = get_header()
+#     
+#     fusions = []
+# 
+#     # recupero fusioni nella linea cellulare
+#     if c_line == "ALL":
+#         for fusion in Gene.nodes.get(symbol = gene_one).had:
+#             if fusion.with_gene.filter(symbol__exact=gene_two):
+# #                 print(fusion)
+#                 fusions.append(fusion)
+#     else:
+#         for fusion in CellLine.nodes.get(cell_line = c_line).happen:
+#             if (fusion.fromGeneToFusion.filter(symbol__exact=gene_one) and fusion.with_gene.filter(symbol__exact=gene_two)) or (fusion.fromGeneToFusion.filter(symbol__exact=gene_two) and fusion.with_gene.filter(symbol__exact=gene_one)):
+#                 fusions.append(fusion)
+# 
+#     rows = build_rows(fusions)
+# #     print(rows)
+# 
+#     response['rows'] = {"header": header, "items": rows}
+#     return HttpResponse(json.dumps(response))
+
+def search_for_exon(request,exon_one,exon_two,c_line):
     response = {}
-    header = get_header()
+    header = get_fc_header()
     
     # recupero fusioni nella linea cellulare
     fusions = []
-
-    if c_line == "ALL":
-        for fusion in Gene.nodes.get(symbol = gene_one).had:
-#             print(fusion)
-            fusions.append(fusion)
-    else:
+    
+    #cell_line all, primo esone si, secondo esone no, tutte le fusioni che coinvolgono questo esone
+    if c_line == "ALL" and exon_one!="ALL" and exon_two == "ALL":
+        e = Exon.nodes.get(exon = exon_one)
+        for fcfusion in e.fromFusionToExon:
+            for fusion in fcfusion.fromFusionToFusionCatcher:
+                fusions.append(fusion)
+    #cell_line all, primo esone si, secondo esone si (011), tutte le fusioni che convolgono la coppia di esoni
+    elif c_line == "ALL" and exon_one!="ALL" and exon_two!="ALL":
+        e = Exon.nodes.get(exon = exon_one)
+        for fcfusion in e.fromFusionToExon:
+            if fcfusion.at_exon.filter(exon__exact=exon_two):
+                fusions.append(fcfusion.fromFusionToFusionCatcher.all()[0])
+    #cell_line si, primo esone no, secondo esone no, ANALOGO A SEARCH FOR CELL_LINE
+    elif c_line!="ALL" and exon_one=="ALL" and exon_two=="ALL":
         for fusion in CellLine.nodes.get(cell_line = c_line).happen:
-            if fusion.fromGeneToFusion.filter(symbol__exact=gene_one) or fusion.fromGeneToFusion.filter(gene_id__exact=gene_one) or fusion.with_gene.filter(symbol__exact=gene_one) or fusion.with_gene.filter(gene_id__exact=gene_one):
-                fusions.append(fusion)
-            
-    rows = build_rows(fusions)
-#     print(rows)
-
-    response['rows'] = {"header": header, "items": rows}
-    return HttpResponse(json.dumps(response))
-
-def search_for_pair_gene(request, gene_one, gene_two, c_line):
-    print("search for pair gene")
-    response = {}
-    header = get_header()
-    
-    fusions = []
-
-    # recupero fusioni nella linea cellulare
-    if c_line == "ALL":
-        for fusion in Gene.nodes.get(symbol = gene_one).had:
-            if fusion.with_gene.filter(symbol__exact=gene_two):
-#                 print(fusion)
-                fusions.append(fusion)
-    else:
+            fusions.append(fusion)     
+    #cell_line si, primo esone si, secondo esone no 
+    elif c_line != "ALL" and exon_one != "ALL" and exon_two == "ALL":
         for fusion in CellLine.nodes.get(cell_line = c_line).happen:
-            if (fusion.fromGeneToFusion.filter(symbol__exact=gene_one) and fusion.with_gene.filter(symbol__exact=gene_two)) or (fusion.fromGeneToFusion.filter(symbol__exact=gene_two) and fusion.with_gene.filter(symbol__exact=gene_one)):
-                fusions.append(fusion)
+            for fcfusion in fusion.with_fc_script:
+                if fcfusion.at_exon.filter(exon__exact=exon_one):
+                    fusions.append(fusion)
+    #cell_line si, primo esone si, secondo esone si 
+    elif c_line != "ALL" and exon_one!="ALL" and exon_two != "ALL":
+        for fusion in CellLine.nodes.get(cell_line = c_line).happen:
+            for fcfusion in fusion.with_fc_script:
+                if fcfusion.at_exon.filter(exon__exact=exon_one) and fcfusion.at_exon.filter(exon__exact=exon_two):
+                    fusions.append(fusion)
 
-    rows = build_rows(fusions)
-#     print(rows)
+    rows = build_fc_rows(fusions)
+    #print(rows)
 
     response['rows'] = {"header": header, "items": rows}
     return HttpResponse(json.dumps(response))
 
-def search_for_single_exon(request,c_line,exon_one):
+# def search_for_single_exon(request,c_line,exon_one):
+#     response = {}
+#     rows = []
+#     header = get_header()
+#     
+#     # recupero fusioni nella linea cellulare
+#     fusions = []
+#     for fusion in CellLine.nodes.get(cell_line = c_line).happen:
+#         if fusion.at_exon.filter(exon__exact=exon_one):
+#             fusions.append(fusion)
+# 
+#     rows = build_rows(fusions)
+# #     print(rows)
+# 
+#     response['rows'] = {"header": header, "items": rows}
+#     return HttpResponse(json.dumps(response))
+# 
+# def search_for_pair_exon(request,c_line,exon_one,exon_two):
+#     response = {}
+#     rows = []
+#     header = get_header()
+#     
+#     # recupero fusioni nella linea cellulare
+#     fusions = []
+#     for fusion in CellLine.nodes.get(cell_line = c_line).happen:
+#         if fusion.at_exon.filter(exon__exact=exon_one) and fusion.at_exon.filter(exon__exact=exon_two):
+#             fusions.append(fusion)
+# 
+#     rows = build_rows(fusions)
+# #     print(rows)
+# 
+#     response['rows'] = {"header": header, "items": rows}
+#     return HttpResponse(json.dumps(response))
+
+def search_for_transcript(request,transcript_one,transcript_two,c_line):
     response = {}
-    rows = []
-    header = get_header()
+    header = get_fc_header()
     
     # recupero fusioni nella linea cellulare
     fusions = []
-    for fusion in CellLine.nodes.get(cell_line = c_line).happen:
-        if fusion.at_exon.filter(exon__exact=exon_one):
-            fusions.append(fusion)
-
-    rows = build_rows(fusions)
-#     print(rows)
-
-    response['rows'] = {"header": header, "items": rows}
-    return HttpResponse(json.dumps(response))
-
-def search_for_pair_exon(request,c_line,exon_one,exon_two):
-    response = {}
-    rows = []
-    header = get_header()
     
-    # recupero fusioni nella linea cellulare
-    fusions = []
-    for fusion in CellLine.nodes.get(cell_line = c_line).happen:
-        if fusion.at_exon.filter(exon__exact=exon_one) and fusion.at_exon.filter(exon__exact=exon_two):
-            fusions.append(fusion)
+    #linea cellulare non specificata, un trascritto specificato
+    if c_line=="ALL" and transcript_one!="ALL" and transcript_two=="ALL":
+        for couple in Transcript.nodes.get(transcript = transcript_one).in_couple:
+            for fcfusion in couple.fromFusionToCouple:
+                fusions.append(fcfusion.fromFusionToFusionCatcher.all()[0])
+        for couple in Transcript.nodes.get(transcript = transcript_one).fromCoupleToTranscript:
+            for fcfusion in couple.fromFusionToCouple:
+                fusions.append(fcfusion.fromFusionToFusionCatcher.all()[0])
+    #linea cellulare non specificata, coppia di trascritti specificata
+    elif c_line=="ALL" and transcript_one!="ALL" and transcript_two!="ALL":
+        for couple in Transcript.nodes.get(transcript = transcript_one).in_couple:
+            if couple.with_other_transcript.filter(transcript__exact=transcript_two) or couple.fromTranscriptToCouple.filter(transcript__exact=transcript_two):
+                for fcfusion in couple.fromFusionToCouple:
+                    fusions.append(fcfusion.fromFusionToFusionCatcher.all()[0])
+        for couple in Transcript.nodes.get(transcript = transcript_one).fromCoupleToTranscript:
+            if couple.with_other_transcript.filter(transcript__exact=transcript_two) or couple.fromTranscriptToCouple.filter(transcript__exact=transcript_two):
+                for fcfusion in couple.fromFusionToCouple:
+                    fusions.append(fcfusion.fromFusionToFusionCatcher.all()[0])            
+        for couple in Transcript.nodes.get(transcript = transcript_two).in_couple:
+            if couple.with_other_transcript.filter(transcript__exact=transcript_two) or couple.fromTranscriptToCouple.filter(transcript__exact=transcript_two):
+                for fcfusion in couple.fromFusionToCouple:
+                    fusions.append(fcfusion.fromFusionToFusionCatcher.all()[0])            
+        for couple in Transcript.nodes.get(transcript = transcript_two).fromCoupleToTranscript:
+            if couple.with_other_transcript.filter(transcript__exact=transcript_one) or couple.fromTranscriptToCouple.filter(transcript__exact=transcript_one):
+                for fcfusion in couple.fromFusionToCouple:
+                    fusions.append(fcfusion.fromFusionToFusionCatcher.all()[0])
+    #linea cellulare specificata, un trascritto specificato:
+    elif c_line!="ALL" and transcript_one!="ALL" and transcript_two=="ALL":
+        for fusion in CellLine.nodes.get(cell_line = c_line).happen:
+            for fcfusion in fusion.with_fc_script:
+                for couple in fcfusion.with_trans_couple:
+                    if couple.fromTranscriptToCouple.filter(transcript__exact=transcript_one) or couple.with_other_transcript.filter(transcript__exact=transcript_one):
+                        fusions.append(fusion)
+    #linea cellulare specificata, coppia di trascritti specificata
+    elif c_line!="ALL" and transcript_one!="ALL" and transcript_two!="ALL":
+        for fusion in CellLine.nodes.get(cell_line = c_line).happen:
+            for fcfusion in fusion.with_fc_script:
+                for couple in fcfusion.with_trans_couple:
+                    if (couple.fromTranscriptToCouple.filter(transcript__exact=transcript_one) and couple.with_other_transcript.filter(transcript__exact=transcript_two)) or (couple.fromTranscriptToCouple.filter(transcript__exact=transcript_two) and couple.with_other_transcript.filter(transcript__exact=transcript_one)):
+                        fusions.append(fusion)
 
-    rows = build_rows(fusions)
-#     print(rows)
+    rows = build_fc_rows(fusions)
+    #print(rows)
 
     response['rows'] = {"header": header, "items": rows}
     return HttpResponse(json.dumps(response))
 
-def search_for_single_transcript(request,c_line,transcript_one):
-    response = {}
-    rows = []
-    header = get_header()
-    
-    # recupero fusioni nella linea cellulare
-    fusions = []
-    for fusion in CellLine.nodes.get(cell_line = c_line).happen:
-        for couple in fusion.with_trans_couple:
-            if couple.fromTranscriptToCouple.filter(transcript__exact=transcript_one) or couple.with_other_transcript.filter(transcript__exact=transcript_one):
-                fusions.append(fusion)
+# def search_for_single_transcript(request,c_line,transcript_one):
+#     response = {}
+#     rows = []
+#     header = get_header()
+#     
+#     # recupero fusioni nella linea cellulare
+#     fusions = []
+#     for fusion in CellLine.nodes.get(cell_line = c_line).happen:
+#         for couple in fusion.with_trans_couple:
+#             if couple.fromTranscriptToCouple.filter(transcript__exact=transcript_one) or couple.with_other_transcript.filter(transcript__exact=transcript_one):
+#                 fusions.append(fusion)
+# 
+#     rows = build_rows(fusions)
+# #     print(rows)
+# 
+#     response['rows'] = {"header": header, "items": rows}
+#     return HttpResponse(json.dumps(response))
 
-    rows = build_rows(fusions)
-#     print(rows)
-
-    response['rows'] = {"header": header, "items": rows}
-    return HttpResponse(json.dumps(response))
-
-def search_for_pair_transcript(request,c_line,transcript_one,transcript_two):
-    response = {}
-    rows = []
-    header = get_header()
-    
-    # recupero fusioni nella linea cellulare
-    fusions = []
-    for fusion in CellLine.nodes.get(cell_line = c_line).happen:
-        for couple in fusion.with_trans_couple:
-            if (couple.fromTranscriptToCouple.filter(transcript__exact=transcript_one) and couple.with_other_transcript.filter(transcript__exact=transcript_two)) or (couple.fromTranscriptToCouple.filter(transcript__exact=transcript_two) and couple.with_other_transcript.filter(transcript__exact=transcript_one)):
-                fusions.append(fusion)
-
-    rows = build_rows(fusions)
-#     print(rows)
-
-    response['rows'] = {"header": header, "items": rows}
-    return HttpResponse(json.dumps(response))
+# def search_for_pair_transcript(request,c_line,transcript_one,transcript_two):
+#     response = {}
+#     rows = []
+#     header = get_header()
+#     
+#     # recupero fusioni nella linea cellulare
+#     fusions = []
+#     for fusion in CellLine.nodes.get(cell_line = c_line).happen:
+#         for couple in fusion.with_trans_couple:
+#             if (couple.fromTranscriptToCouple.filter(transcript__exact=transcript_one) and couple.with_other_transcript.filter(transcript__exact=transcript_two)) or (couple.fromTranscriptToCouple.filter(transcript__exact=transcript_two) and couple.with_other_transcript.filter(transcript__exact=transcript_one)):
+#                 fusions.append(fusion)
+# 
+#     rows = build_rows(fusions)
+# #     print(rows)
+# 
+#     response['rows'] = {"header": header, "items": rows}
+#     return HttpResponse(json.dumps(response))
 
 def search_for_fusion_information(request,c_line,algorithm,fusion_description,predicted_effect1,predicted_effect2):
     response = {}
@@ -483,6 +586,16 @@ def cell_lines(request):
     
     for cell_line in CellLine.nodes.all():
         response.append(cell_line.cell_line)
+        
+    return HttpResponse(json.dumps(response))
+
+def viruses(request):
+    response = []
+
+    response.append("ALL")
+    
+    for virus in Virus.nodes.all():
+        response.append(virus.name)
         
     return HttpResponse(json.dumps(response))
 
@@ -663,7 +776,7 @@ def get_cell_line_from_disease(disease):
     ccle_infos = get_ccle_infos()["items"]
     
     cls = []
-    for row in ccle_infos:
+    for row in ccle_infos["items"]:
         if disease in row:
             cls.append(row[0])
     
@@ -773,12 +886,11 @@ def get_single_distribution(request, label, value):
     
     return HttpResponse(json.dumps(response))
 
-
-
 def build_rows(fusions):
     rows = []
     
     ccle_infos = get_ccle_infos()
+    
     for myfusion in fusions:
         # recupero dati cell line
         cellLine = myfusion.fromCellLineToFusion.all()[0].cell_line
@@ -801,13 +913,46 @@ def build_rows(fusions):
         th_flag = "NO TH"
         
         if(myfusion.with_fc_script):
-            fc_flag = '{ type: "button", action: "dialog", url: fusioncatcher/'+str(myfusion.fusion_id)+' }'
+            fc_flag = { "type": "button", "action": "dialog", "label": "FC", "card": {
+                "title": "Detailed information for gene pair: " + str(gene1.symbol) + "/" + str(gene2.symbol),
+                "width": "100",
+                "elements": [
+                        {
+                                "type": "table",
+                                "data": {
+                                        "url": "http://localhost/api/fusion/fusioncatcher/"+str(myfusion.fusion_id)
+                                }
+                        }
+                ]
+                }}
         if(myfusion.with_eric_script):
-            es_flag = '{ type: "button", action: "dialog", url: ericscript/'+str(myfusion.fusion_id)+' }'
+            es_flag = { "type": "button", "action": "dialog", "label": "ES", "card": {
+                "title": "Detailed information for gene pair: " + str(gene1.symbol) + "/" + str(gene2.symbol),
+                "width": "100",
+                "elements": [
+                        {
+                                "type": "table",
+                                "data": {
+                                        "url": "http://localhost/api/fusion/ericscript/"+str(myfusion.fusion_id)
+                                }
+                        }
+                ]
+                }}
         if(myfusion.with_tophat_script):
-            th_flag = '{ type: "button", action: "dialog", url: tophat/'+str(myfusion.fusion_id)+' }'
+            th_flag = { "type": "button", "action": "dialog", "label": "TH", "card": {
+                "title": "Detailed information for gene pair: " + str(gene1.symbol) + "/" + str(gene2.symbol),
+                "width": "100",
+                "elements": [
+                        {
+                                "type": "table",
+                                "data": {
+                                        "url": "http://localhost/api/fusion/tophat/"+str(myfusion.fusion_id)
+                                }
+                        }
+                ]
+                }}
         
-        rows.append([disease,acronym,cellLine,gene1.symbol,gene2.symbol,fc_flag,es_flag,th_flag])
+        rows.append([disease,acronym,cellLine,gene1.symbol,gene2.symbol,fc_flag,es_flag, th_flag])
         
         #print(gene1.symbol+" "+gene2.symbol)
         #print(fc_fusions)   
@@ -815,6 +960,47 @@ def build_rows(fusions):
         #print("\n\n\n")
         
     return rows
+
+# def build_rows(fusions):
+#     rows = []
+#     
+#     ccle_infos = get_ccle_infos()
+#     for myfusion in fusions:
+#         # recupero dati cell line
+#         cellLine = myfusion.fromCellLineToFusion.all()[0].cell_line
+#         disease = ""
+#         acronym = ""
+#         
+#         for row in ccle_infos["items"]:
+#             if cellLine in row:
+#                 disease = row[3]
+#                 acronym = row[2]
+#                 
+#         #recupero dati dai geni
+#         gene1 = myfusion.fromGeneToFusion.all()[0]
+#         gene2 = myfusion.with_gene.all()[0]
+#        
+#       
+#         #check
+#         fc_flag = "NO FC"
+#         es_flag = "NO ES"
+#         th_flag = "NO TH"
+#         
+#         if(myfusion.with_fc_script):
+#             fc_flag = '{ type: "button", action: "dialog", url: fusioncatcher/'+str(myfusion.fusion_id)+' }'
+#         if(myfusion.with_eric_script):
+#             es_flag = '{ type: "button", action: "dialog", url: ericscript/'+str(myfusion.fusion_id)+' }'
+#         if(myfusion.with_tophat_script):
+#             th_flag = '{ type: "button", action: "dialog", url: tophat/'+str(myfusion.fusion_id)+' }'
+#         
+#         rows.append([disease,acronym,cellLine,gene1.symbol,gene2.symbol,fc_flag,es_flag,th_flag])
+#         
+#         #print(gene1.symbol+" "+gene2.symbol)
+#         #print(fc_fusions)   
+#         #print(es_fusions)
+#         #print("\n\n\n")
+#         
+#     return rows
 
 
 #BUILD_FC_TABLE E BUILD_ES_TABLE per costruire la tabella dei dettagli per ogni coppia. Quando premo il pulsante relativo all'algoritmo deve stamparmi tutte le fusioni relative
@@ -828,16 +1014,18 @@ def build_fc_table(request,fus_id):
     
 #     for fcFusion in Fusion.nodes.get(fusion_id = fus_id).with_fc_script:
 #         fusions.append(fcFusion)
-        
-    for fusion in Fusion.nodes.all():
-        if fusion.fusion_id == int(fus_id):
-            if fusion.with_fc_script:
-                fusions.append(fusion)
+    
+    fusions.append(Fusion.nodes.get(fusion_id = fus_id))
+    
+    #for fusion in Fusion.nodes.all():
+        #if fusion.fusion_id == int(fus_id):
+            #if fusion.with_fc_script:
+                #fusions.append(fusion)
         
         
     rows = build_fc_rows(fusions)
     
-    response['rows'] = {"header": header, "items": rows}
+    response['details'] = {"header": header, "items": rows}
     return HttpResponse(json.dumps(response))
 
 def build_es_table(request,fus_id):
@@ -847,17 +1035,22 @@ def build_es_table(request,fus_id):
     
     fusions = []
     
-#     for esFusion in Fusion.nodes.get(fusion_id = fus_id).with_eric_script:
-#         fusions.append(esFusion)
+    print("Building ES TABLE with FUS_ID="+fus_id)
+    
+    #for esFusion in Fusion.nodes.get(fusion_id = int(fus_id)).with_eric_script:
+        #fusions.append(esFusion)
+        
+    fusions.append(Fusion.nodes.get(fusion_id = fus_id))
 
-    for fusion in Fusion.nodes.all():
-        if fusion.fusion_id == int(fus_id):
-            if fusion.with_eric_script:
-                fusions.append(fusion)
+    
+    #for fusion in Fusion.nodes.all():
+        #if fusion.fusion_id == int(fus_id):
+            #if fusion.with_eric_script:
+                #fusions.append(fusion)
         
     rows = build_es_rows(fusions)
     
-    response['rows'] = {"header": header, "items": rows}
+    response['details'] = {"header": header, "items": rows}
     return HttpResponse(json.dumps(response))
 
 def build_th_table(request,fus_id):
@@ -867,17 +1060,19 @@ def build_th_table(request,fus_id):
     
     fusions = []
     
+    fusions.append(Fusion.nodes.get(fusion_id = fus_id))
+    
 #     for esFusion in Fusion.nodes.get(fusion_id = fus_id).with_eric_script:
 #         fusions.append(esFusion)
 
-    for fusion in Fusion.nodes.all():
-        if fusion.fusion_id == int(fus_id):
-            if fusion.with_tophat_script:
-                fusions.append(fusion)
+    #for fusion in Fusion.nodes.all():
+        #if fusion.fusion_id == int(fus_id):
+            #if fusion.with_tophat_script:
+                #fusions.append(fusion)
         
     rows = build_tophat_rows(fusions)
     
-    response['rows'] = {"header": header, "items": rows}
+    response['details'] = {"header": header, "items": rows}
     return HttpResponse(json.dumps(response))
 
 def build_fc_rows(fusions):
@@ -928,11 +1123,11 @@ def build_fc_rows(fusions):
             
         #costruisco la riga
         row = []
-        row.append(gene1.symbol+" - "+gene2.symbol)
-        if exon1 or exon2:
-            row.append(exon1.exon+" - "+exon2.exon)
-        else:
-            row.append("No exons")
+        #row.append(gene1.symbol+" - "+gene2.symbol)
+        #if exon1 or exon2:
+            #row.append(exon1.exon+" - "+exon2.exon)
+        #else:
+            #row.append("No exons")
         row.append([chromosome1.chromosome+":"+str(fusion_point_1)+":"+strand_1, chromosome2.chromosome+":"+str(fusion_point_2)+":"+strand_2])
         row.append(myfusion.description)
         row.append(myfusion.common_mapping_reads)
@@ -953,6 +1148,9 @@ def build_fc_rows(fusions):
 
 #SCRIVERE BUILD_ES_ROWS
 def build_es_rows(fusions):
+    
+    print("Building ES rows " + str(len(fusions)))
+    
     rows = []
     #recupero dati degli eventi di fusione
         
@@ -990,7 +1188,7 @@ def build_es_rows(fusions):
         
         #costruisco la riga
         row = []
-        row.append(gene1.symbol+" - "+gene2.symbol)
+        #row.append(gene1.symbol+" - "+gene2.symbol)
         row.append([chromosome1.chromosome+":"+str(breakpoint1)+":"+strand1, chromosome2.chromosome+":"+str(breakpoint2)+":"+strand2])
         row.append(crossing_reads)
         row.append(spanning_reads)
@@ -1017,12 +1215,12 @@ def build_tophat_rows(fusions):
     th_fusions = []
     
     for fus in fusions:
-        for thfusion in fus.with_tophatscript:
+        for thfusion in fus.with_tophat_script:
             th_fusions.append(thfusion)
     
     for myfusion in th_fusions:
-        gene1 = myfusion.fromFusionToTophatScript.all()[0].fromGeneToFusion.all()[0]
-        gene2 = myfusion.fromFusionToTophatScript.all()[0].with_gene.all()[0]
+        gene1 = myfusion.fromFusionToTophat.all()[0].fromGeneToFusion.all()[0]
+        gene2 = myfusion.fromFusionToTophat.all()[0].with_gene.all()[0]
         
         #recupero cromosomi 
         chromosome1 = gene1.fromChromosomeToGene.all()[0]
@@ -1036,7 +1234,7 @@ def build_tophat_rows(fusions):
         
         #costruisco la riga
         row = []
-        row.append(gene1.symbol+" - "+gene2.symbol)
+        #row.append(gene1.symbol+" - "+gene2.symbol)
         row.append([chromosome1.chromosome+":"+str(left_coord), chromosome2.chromosome+":"+str(right_coord)])
         row.append(spanning_reads)
         row.append(spanning_mate_pairs)
@@ -1048,13 +1246,15 @@ def build_tophat_rows(fusions):
     return rows
     
 
-def search_viruses(request,c_line,vir):
+def search_viruses(request, vir, c_line):
     response = {}
     rows = []
     header = ["Cell line",
         "Virus/bacteria/phage name",
         "GI",
         "NC"]
+    
+    print("Searching for {} and {}".format(vir, c_line))
     
     #recupero virus nella linea cellulare
     #se ho specificato solo il virus, cerca per tutte le linee cellulari
@@ -1064,7 +1264,7 @@ def search_viruses(request,c_line,vir):
                 if vir in virus.name or vir == virus.gi or vir == virus.ref:
                     rows.append([c_l.cell_line, virus.name, virus.gi, virus.ref])
     #se ho specificato solo la linea cellulare, cerca tutti i virus per la linea cellulare
-    elif c_line !="" and vir == "trolo":
+    elif c_line !="" and vir == "ALL":
         for virus in CellLine.nodes.get(cell_line = c_line).with_viruses:
             rows.append([c_line, virus.name, virus.gi, virus.ref])
     #se ho specificato sia virus che linea cellulare, cerca quel virus per quella linea cellulare
@@ -1138,7 +1338,8 @@ def get_header():
             "Tophat"]
     
 def get_fc_header():
-    return ["Gene pair symbols",
+    return [
+        #"Gene pair symbols",
         "Exon pair",
         "Chromosome : fusion point : strand",
         "Description",
@@ -1153,7 +1354,8 @@ def get_fc_header():
         "Predicted fused proteins"]
     
 def get_es_header():
-    return ["Gene pair symbols",
+    return [
+        #"Gene pair symbols",
         "Chromosome : breakpoint : strand",
         "Crossing reads",
         "Spanning reads",
@@ -1170,7 +1372,8 @@ def get_es_header():
         "Eric score"]
     
 def get_tophat_header():
-    return ["Gene pair symbols",
+    return [
+        #"Gene pair symbols",
             "Chromosome : coordinate",
             "Spanning reads",
             "Spanning mate pairs",

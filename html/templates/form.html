@@ -46,16 +46,18 @@
 		</md-card-title>
 		<md-card-content>
 			<table md-table md-row-select multiple>
-				<thead style="display:table;" md-head>
+				<thead md-head>
 		        	<tr md-row>
 		            	<th md-column ng-repeat="col in ctrl.form_results.header track by $index"><span>{{col}}</span></th>
 					</tr>
 				</thead>
-				<tbody style="max-height: 500px; display: block; overflow-y: scroll;" md-body>
+				<tbody style="max-height: 500px;" md-body>
 			        <tr ng-if="!ctrl.sending" md-row md-auto-select ng-repeat="row in ctrl.form_results.items track by $index">
-			        	<td md-cell ng-repeat="field in row track by $index" style="max-width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-							<span>{{field}}</span>
-						</td>
+			        	<td md-cell ng-repeat="field in row track by $index" style="max-width: 100px; overflow: hidden; white-space: nowrap;">
+                                            <md-button  ng-if='field.type == "button"' ng-click="ctrl.show_dialog($event, field.card)" class="md-raised md-primary">{{field.label}}</md-button>
+                                            <span ng-if='field.startsWith("NO ")'>-</span>
+                                            <span ng-if='!field.startsWith("NO ") && field.type != "button"' style="text-overflow: ellipsis;">{{field}}</span>
+                                        </td>
 					</tr>
 				</tbody>
 			</table>

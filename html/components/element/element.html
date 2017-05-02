@@ -10,7 +10,11 @@
 				</tr>
 			</thead>
 			<tr md-row md-auto-select ng-repeat="item in subdata.items track by $index">
-				<td md-cell style="text-align: right;"><span>{{item}}</span></td>
+                            <td md-cell ng-repeat="field in item track by $index">
+                                        <md-button  ng-if='field.type == "button"' ng-click="ctrl.show_dialog($event, field.card)" class="md-raised md-primary">{{field.label}}</md-button>
+                                        <span ng-if='field.startsWith("NO ")'>-</span>
+                                        <span ng-if='!field.startsWith("NO ") && field.type != "button"' style="text-overflow: ellipsis;">{{field}}</span>
+                                    </td>
 			</tr>
 		</tbody>
 		

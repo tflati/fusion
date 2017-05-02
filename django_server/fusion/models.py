@@ -70,7 +70,7 @@ class Exon(StructuredNode):
     fromFusionToExon = RelationshipFrom('FusionCatcher', "AT_EXON")
     
 class Fusion(StructuredNode):
-    fusion_id = IntegerProperty()
+    fusion_id = StringProperty()
     #
     with_fc_script = RelationshipTo('FusionCatcher',"WITH_FC_SCRIPT")
     with_eric_script =  RelationshipTo('EricScript',"WITH_ERIC_SCRIPT")
@@ -130,7 +130,7 @@ class Tophat(StructuredNode):
     spanning_mate_pairs = StringProperty()
     spanning_mate_pairs_end = StringProperty()
     #
-    fromFusionToTophat = RelationshipFrom('Fusion','WTIH_TOPHAT_SCRIPT')
+    fromFusionToTophat = RelationshipFrom('Fusion','WITH_TOPHAT_SCRIPT')
     
 class Transcript(StructuredNode):
     transcript = StringProperty()
