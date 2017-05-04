@@ -81,7 +81,6 @@ class Fusion(StructuredNode):
     fromCellLineToFusion = RelationshipFrom('CellLine',"HAPPEN")
     fromGeneToFusion = RelationshipFrom('Gene',"HAD")
     
-    
 class FusionCatcher(StructuredNode):
     fusion_id = IntegerProperty()
     description = ArrayProperty()
@@ -89,7 +88,7 @@ class FusionCatcher(StructuredNode):
     spanning_pairs = IntegerProperty()
     spanning_unique_reads = IntegerProperty()
     longest_anchor_found = IntegerProperty()
-    fusion_finding_method = StringProperty()
+    fusion_finding_method = ArrayProperty()
     fusion_sequence = StringProperty()
     fusion_point_1 = IntegerProperty()
     fusion_point_2 = IntegerProperty()

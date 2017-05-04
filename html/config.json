@@ -1,7 +1,7 @@
 {
-	"title": "SFGdb Portal",
-	"description": "SFGdb: Somatic Fusion Genes database detected from paired-end RNA-sequencing TCGA data",
-	"long_description": "SFGdb is a database designed to provide access to predictions and annotations of Somatic Fusion Genes detected from paired-end RNA-sequencing data. Fusion analysis has been performed using the FusionCatcher algorithm on 935 tumor cell lines available on TCGA repository with hg38 as reference genome.",
+	"title": "CCLE-Fusion Portal",
+	"description": "CCLE-Fusion Portal provides an easy access to a comprehensive database designed for storing, displaying and annotating gene fusion events detected from NGS data data.",
+	"long_description": "CCLE-Fusion Portal is an integrated resource which allows to query a database of somatic fusion genes events predicted and annotated starting from paired-end RNA-seq data. Data have been analysed using three fusion detection algorithms: FusionCatcher, EricScript and Tophat-Fusion. Tha analysis has been carried out on 935 tumor cell lines obtained from The Cancer Cell Line Encyclopedia (CCLE) repository (<a href='https://portals.broadinstitute.org/ccle/home'>https://portals.broadinstitute.org/ccle/home</a>) using hg38 as reference genome. The obtained results are detailed for each source algorithm and, whenever the fusion genes predictions coincide for two or more methods, the intersection is shown in order to provide more reliable results.",
 	"image": {
 		"src": "logo.png",
 		"percentage_width": "200"
@@ -18,7 +18,7 @@
 		"statistics_all": "http://localhost/api/fusion/statistics_all/",
 		"statistics_by_chromosome": "http://localhost/api/fusion/get_distribution/Chromosome/Fusion/",
 		"statistics_single_chromosome": "http://localhost/api/fusion/get_single_distribution/Chromosome/",
-		"circos_url": "http://localhost/api/fusion/cell_line/"
+		"circos_url": "http://localhost/api/fusion/cell_line_events/"
 	},
 	"menu": [{
 			"name": "Home",
@@ -43,6 +43,9 @@
 			}, {
 				"name": "Search for Fusion information",
 				"url": "search_for_fusion"
+			}, {
+                                "name": "Search for Algorithm",
+                                "url": "search_for_algorithm"
 			}, {
 				"name": "Search Viruses",
 				"url": "search_for_viruses"
@@ -292,50 +295,45 @@
 			"default": "CCLE_0384",
 			"required": "true"
 		}, {
-			"label": "Mapping algorithm",
-			"type": "select",
-			"values": "http://localhost/api/fusion/mapping_algorithms/",
-			"placeholder": "Any",
-			"required": "true"
-		}, {
 			"label": "Fusion description",
 			"type": "select",
-			"values": "http://localhost/api/fusion/fusion_descriptions",
+			"values": "http://localhost/api/fusion/fusion_descriptions/",
+			"multiple": true,
 			"placeholder": "Any",
 			"required": "true"
 		}, {
 			"label": "Predicted Effects",
 			"type": "select",
-			"values": "http://localhost/api/fusion/predicted_effects",
+			"values": "http://localhost/api/fusion/predicted_effects/",
+			"multiple": true,
 			"placeholder": "Any",
-			"required": "true",
-			"form": [{
-				"index": 4,
-				"name": "subform_search_for_fusion",
-				"fields": [{
-					"label": "Predicted effect for 5' end gene",
-					"type": "select",
-					"values": "http://localhost/api/fusion/Predicted_effect_for_end_gene",
-					"placeholder": "Any",
-					"default": "",
-					"value": "2",
-					"required": "true"
-				}, {
-					"label": "Predicted effect for 3' end gene",
-					"type": "select",
-					"values": "http://localhost/api/fusion/Predicted_effect_for_end_gene",
-					"placeholder": "Any",
-					"default": "",
-					"value": "2",
-					"required": "true"
-				}]
-			}]
+			"required": "true"
 		}],
 		"submit": {
 			"label": "Submit",
 			"url": "http://localhost/api/fusion/fusions/"
 		}
 	}, {
+		"name": "search_for_algorithm",
+		"fields": [{
+			"label": "Cell line",
+			"type": "select",
+			"values": "http://localhost/api/fusion/cell_lines/",
+			"placeholder": "CCLE_0384",
+			"default": "CCLE_0384",
+			"required": "true"
+		}, {
+			"label": "Algorithm",
+			"type": "checkbox",
+			"values": "http://localhost/api/fusion/algorithms/",
+			"required": "true"
+		}],
+		"submit": {
+			"label": "Submit",
+			"url": "http://localhost/api/fusion/fusions_by_algorithm/"
+		}
+	},	
+	{
 		"name": "search_for_gene",
 		"fields": [{
                         "label": "Symbol or EnsembleID of first gene (e.g., DHRS1 or ENSG00000157379)",
@@ -384,7 +382,7 @@
                 }],
 		"submit": {
 			"label": "Submit",
-			"url": "http://localhost/api/fusion/exons"
+			"url": "http://localhost/api/fusion/exon"
 		}
 	}, {
 		"name": "search_for_transcript",

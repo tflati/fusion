@@ -64,7 +64,7 @@
 
 	<md-card class="full-card full-card-header">
 		<md-card-title style="text-align: center;">{{ctrl.circos.events[2].length}} fusion events for cell line &nbsp;
-			<md-select style="margin: 0px;" ng-change="ctrl.show_circos('http://localhost/api/fusion/cell_line/' + ctrl.circos.value + '/')" ng-init="ctrl.load_circos('http://localhost/api/fusion/cell_lines/')" ng-model="ctrl.circos.value" ng-model-options="{trackBy: '$value.id'}">
+			<md-select style="margin: 0px;" ng-change="ctrl.show_circos('http://localhost/api/fusion/cell_line_events/' + ctrl.circos.value + '/')" ng-init="ctrl.load_circos('http://localhost/api/fusion/cell_lines/')" ng-model="ctrl.circos.value" ng-model-options="{trackBy: '$value.id'}">
 				<md-option ng-value="value" ng-repeat="value in ctrl.circos.values track by $index">{{value}}</md-option>
 			</md-select>
 		</md-card-title>

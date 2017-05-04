@@ -1,37 +1,45 @@
 <section style="padding: 0% 5% 0% 5%;">
-	<p ng-bind-html="ctrl.info.long_description"></p>
-		
-	<form ng-submit="ctrl.send_query()">
-	
-		<div ng-repeat="field in ctrl.form.fields track by $index">
-			<md-input-container class="md-input-has-placeholder">
-				<label style="min-width: 400px;" ng-if="field.type != 'checkbox'" ng-bind="field.label"></label>
-				
-				<input ng-if="field.type != 'choice' && field.type != 'select' && field.type != 'checkbox'" placeholder="{{field.placeholder}}" ng-model="field.value" ng-value="{{field.default}}" type="{{field.type}}"/>
-				
-				<md-select ng-model="field.value" ng-if="field.type == 'select' && (!field.multiple || field.multiple == false)" ng-model-options="{trackBy: '$value.id'}">
-					<md-option ng-value="value" ng-repeat="value in field.values track by $index">{{value}}</md-option>
-				</md-select>
-				
-				<md-select multiple ng-model="field.value" ng-if="field.type == 'select' && field.multiple && field.multiple == true" ng-model-options="{trackBy: '$value.id'}">
-					<md-option ng-value="value" ng-repeat="value in field.values track by $index">{{value}}</md-option>
-				</md-select>
-				
-				<md-checkbox ng-if="field.type == 'checkbox'" ng-model="field.value" ng-checked="{{field.checked}}">
-					{{field.label}}
-				</md-checkbox>
-			</md-input-container>
-			
-			<md-radio-group>
-				<md-radio-button ng-click="ctrl.load_form(field, value)" ng-if="field.type == 'choice' && field.subtype == 'radio'" ng-repeat="value in field.values track by $index" name="{{field.group_id}}" ng-model="field.value" ng-checked="{{value.selected}}" ng-value="value.label" type="radio" aria-label="Multi-choice">
-					{{value.label}}
-				</md-radio-button>
-				
-			</md-radio-group>
-		</div>
-		<md-button ng-click="ctrl.send_query()" class="md-primary md-raised">{{ctrl.form.submit.label}}</md-button>
+    <p ng-bind-html="ctrl.info.long_description"></p>
+            
+    <form ng-submit="ctrl.send_query()">
+    
+        <div ng-repeat="field in ctrl.form.fields track by $index">
+            <md-input-container class="md-input-has-placeholder">
+                <label style="min-width: 400px;" ng-if="field.type != 'checkbox'" ng-bind="field.label"></label>
+                
+                <input ng-if="field.type != 'choice' && field.type != 'select' && field.type != 'checkbox'" placeholder="{{field.placeholder}}" ng-model="field.value" ng-value="{{field.default}}" type="{{field.type}}"/>
+                
+                <md-select ng-model="field.value" ng-if="field.type == 'select' && (!field.multiple || field.multiple == false)" ng-model-options="{trackBy: '$value.id'}">
+                        <md-option ng-value="value" ng-repeat="value in field.values track by $index">{{value}}</md-option>
+                </md-select>
+                
+                <md-select multiple ng-model="field.value" ng-if="field.type == 'select' && field.multiple && field.multiple == true" ng-model-options="{trackBy: '$value.id'}">
+                        <md-option ng-value="value" ng-repeat="value in field.values track by $index">{{value}}</md-option>
+                </md-select>
+                
+                <fieldset ng-if="field.type == 'checkbox'">
+                    <legend>{{field.label}}</legend>
+                        <div ng-repeat="value in field.values track by $index" flex="50">
+                            <md-checkbox ng-checked="ctrl.exists(value, field)" ng-click="ctrl.toggle(value, field)">
+                            {{value}}
+                            </md-checkbox>
+                        </div>
+                </fieldset>
+                
+                <!--<md-checkbox ng-if="field.type == 'checkbox'" ng-model="field.value" ng-checked="{{field.checked}}" ng-repeat="value in field.values track by $index">
+                        {{value}}
+                </md-checkbox>-->
+                
+                <md-radio-group ng-if="field.type == 'choice' && field.subtype == 'radio'">
+                    <md-radio-button ng-click="ctrl.load_form(field, value)" ng-repeat="value in field.values track by $index" name="{{field.group_id}}" ng-model="field.value" ng-checked="{{value.selected}}" ng-value="value.label" type="radio" aria-label="Multi-choice">
+                            {{value.label}}
+                    </md-radio-button>				
+                </md-radio-group>
+            </md-input-container>			
+        </div>
+        <md-button ng-click="ctrl.send_query()" class="md-primary md-raised">{{ctrl.form.submit.label}}</md-button>
 <!-- 		<input type="submit" ng-value="ctrl.form.submit.label"> -->
-	</form>
+    </form>
 </section>
 
 <section style="padding: 0% 5% 0% 5%;">
@@ -53,7 +61,8 @@
 				</thead>
 				<tbody style="max-height: 500px;" md-body>
 			        <tr ng-if="!ctrl.sending" md-row md-auto-select ng-repeat="row in ctrl.form_results.items track by $index">
-			        	<td md-cell ng-repeat="field in row track by $index" style="max-width: 100px; overflow: hidden; white-space: nowrap;">
+<!-- 			        style="max-width: 100px; overflow: hidden; white-space: nowrap;" -->
+			        	<td md-cell ng-repeat="field in row track by $index">
                                             <md-button  ng-if='field.type == "button"' ng-click="ctrl.show_dialog($event, field.card)" class="md-raised md-primary">{{field.label}}</md-button>
                                             <span ng-if='field.startsWith("NO ")'>-</span>
                                             <span ng-if='!field.startsWith("NO ") && field.type != "button"' style="text-overflow: ellipsis;">{{field}}</span>

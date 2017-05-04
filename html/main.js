@@ -163,35 +163,41 @@ app.controller("controller", function($http, $scope, $mdDialog, $timeout, $mdSid
                                 
                                 console.log("SHOWING CIRCOS DATA: SUCCESS from url", url, response.data.rows);
                                 
+                                var event = {fusion: "ABL1--BCR", g1chr: 9, g1start: 133589707, g1end: 133589707, g1name: "ABL1", g2chr: 22, g2start: 23523148, g2end: 23523148, g2name: "BCR"}
+                                
                                 var circos_events = [];
+                                circos_events.push(event);
+                                
                                 for(var i=0; i<response.data.rows.items.length; i++)
                                 {
                                         var item = response.data.rows.items[i];
                                         
-                                        console.log(item);
-                                        
                                         // Prototype: {fusion: "FGFR3--TACC3", g1chr: 4, g1start: 1795662, g1end: 1808986, g1name: "FGFR3", g2chr: 4, g2start: 1723217, g2end: 1746905, g2name: "TACC3"},
-                                        // var gene_pair = item[1];
-                                        // var gene1 = gene_pair.split("-")[0].trim();
-                                        // var gene2 = gene_pair.split("-")[1].trim();
-                                        var gene1 = item[3]
-                                        var gene2 = item[4]
                                         
-                                        var chrom_pair = JSON.parse(item[4].replace(/'/g, '"'));
-                                        var chrm1 = chrom_pair[0].split(":")[0];
-                                        var chrm2 = chrom_pair[1].split(":")[0];
-                                        var fusion_point1 = chrom_pair[0].split(":")[1];
-                                        var fusion_point2 = chrom_pair[1].split(":")[1];
+                                        if(i<10) console.log(item);
                                         
-                                        circos_events.push(
-                                                {fusion: gene1+"--"+gene2 , g1chr: chrm1, g1start: fusion_point1, g1end: fusion_point1, g1name: gene1, g2chr: chrm2, g2start: fusion_point2, g2end: fusion_point2, g2name: gene2}
-                                        );
-                                }
+                                        item.fusion = item.g1 + "--" + item.g2;
+                                        item.g1name = item.g1;
+                                        item.g2name = item.g2;
+                                        delete item.g1
+                                        delete item.g2
+                                        
+                                        item.g1start = parseInt(item.g1start);
+                                        item.g1end = item.g1start
+                                        item.g2start = parseInt(item.g2start);
+                                        item.g2end = item.g2start
+                                        item.g1chr = item.g1chr.replace("chr", "");
+                                        item.g2chr = item.g2chr.replace("chr", "");
+                                        
+                                        circos_events.push(item);
+
+//                                         circos_events.push({fusion: gene1+"--"+gene2 , g1chr: chrm1, g1start: fusion_point1, g1end: fusion_point1, g1name: gene1, g2chr: chrm2, g2start: fusion_point2, g2end: fusion_point2, g2name: gene2});
+                                }                              
                                 
                                 console.log("CIRCOS EVENTS", circos_events);
-                                console.log(self.circos);
+                                circos_events = circos_events.slice(0, 30);
+                                
                                 self.circos.events[2] = circos_events;
-                                console.log(circos_events);
                                 
                                 BioCircos01 = new BioCircos(self.circos.events, self.circos.genome, {
                                     target : "biocircos",
@@ -232,7 +238,8 @@ app.controller("controller", function($http, $scope, $mdDialog, $timeout, $mdSid
                                 var field = self.form.fields[i];
                                 var value = field.value;
                                 console.log("VALUE", value)
-                                if (i == 0 && (value == undefined || value == "")) continue;
+                                // if (i == 0 && (value == undefined || value == "")) continue;
+                                if (value == undefined || value == "undefined" || value == "") value = "ALL";
                                 args.push(value);
                         }
                         
@@ -334,7 +341,7 @@ app.controller("controller", function($http, $scope, $mdDialog, $timeout, $mdSid
                                     {
                                             field.checked = true;
                                     }
-                                    else if(field.type === "select")
+                                    else if(field.type === "select" || (field.type === "checkbox" && field.values.startsWith("http")))
                                     {
                                             var ajaxForms = self.ajax2forms[field.values];
                                             if( !ajaxForms ) {ajaxForms = []; self.ajax2forms[field.values] = ajaxForms;}
@@ -443,9 +450,18 @@ app.controller("controller", function($http, $scope, $mdDialog, $timeout, $mdSid
                             });
                         };
                                     
-                            $scope.toggle = function() {
-                                    return $mdSidenav('left').toggle();
-                                }
+                            
+        
+                    self.exists = function(item, field){
+                        if(field.value == undefined) return false;
+                        return field.value.indexOf(item) > -1;
+                    };
+                    self.toggle = function (item, field) {
+                        if(field.value == undefined) field.value = []                        
+                        var idx = field.value.indexOf(item);
+                        if (idx > -1) field.value.splice(idx, 1);
+                        else field.value.push(item);
+                    };
                                     
                                 $scope.chartlabels = ["January", "February", "March", "April", "May", "June", "July"];
                                 $scope.chartseries = ['Series A', 'Series B'];
