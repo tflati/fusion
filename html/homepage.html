@@ -1,0 +1,76 @@
+<div layout="column" ng-cloak>
+		
+	<md-toolbar class="md-menu-toolbar" id="toolbar" ng-class="{'padding-v-small': inForm()}">
+	
+		<div layout="row" class="md-toolbar-tools auto-height">
+			<md-menu-bar>
+              <md-menu ng-repeat="item in info.menu">
+                 <button ng-click="item.items.length > 0 ? $mdMenu.open() : goTo(item)">{{item.name}}</button>
+                 <md-menu-content ng-show="item.items.length > 0">
+                     <md-menu-item ng-repeat="subitem in item.items">
+                           <md-button ng-click="goTo(subitem)"> {{subitem.name}} </md-button>
+                     </md-menu-item>
+                 </md-menu-content>
+              </md-menu>
+          </md-menu-bar>
+			
+			<span flex></span>
+			<div ng-if="info.login == undefined || info.login">
+				<div style="display: inline-block;">
+					<md-button ng-if="!dataService.loggedIn" class="md-primary md-raised" style="text-decoration: none;" ng-click="goTo({url: 'login'})">
+						<i class="fa fa-key"></i>
+						Login
+					</md-button>
+					<md-button ng-if="!dataService.loggedIn" class="md-primary md-raised" style="text-decoration: none;" ng-click="goTo({url: 'register'})">
+						<i class="fa fa-user-plus"></i>
+						Register
+					</md-button>
+					
+					<md-button ng-if="dataService.loggedIn" style="text-decoration: none;" ng-click="goTo({url: 'user'})">
+						<i class="fa fa-user"></i>
+						{{dataService.username}}
+					</md-button>
+					
+					<md-button ng-if="dataService.loggedIn" class="md-accent md-raised" style="text-decoration: none;" ng-click="goTo({url: 'logout'})">
+						<i class="fa fa-sign-out"></i>
+						Logout
+					</md-button>					
+				</div>
+				<div ng-if="header.show_logos && inForm()" style="display: inline-block;">
+					<span ng-bind="info.title_short"></span>
+					<md-card-title-media class="header-logo-container-menu padding-v-no" layout-padding>
+						<img class="header-logo-menu" ng-repeat="logo in info.logos" ng-src="{{logo.image}}">
+					</md-card-title-media>
+				</div>
+			</div>
+		</div>
+	</md-toolbar>
+	
+	<section layout="row" flex="100" ng-hide="get_current_page_data().display_header == false">
+		<md-card layout="row" class="full-card full-card-header">
+		    <img ng-src="{{info.image.src}}" class="md-card-image header-image" style="max-height:{{info.image.percentage_width}}px;">
+			<md-card-title layout="column" ng-class="{'padding-v-no': inForm()}">
+				<md-card-title-text layout="column">
+					<span class="md-headline" ng-if="!inForm()" style="font-size: 2em;" ng-bind="info.title"></span>
+					<span class="md-subhead" ng-bind-html="info.description"></span>
+
+					<md-card-title-media ng-if="header.show_logos && !inForm()" layout="row" class="header-logo-container" flex="auto" layout-padding>
+						<img class="header-logo" ng-repeat="logo in info.logos" ng-src="{{logo.image}}">
+					</md-card-title-media>
+				</md-card-title-text>
+			</md-card-title>
+		</md-card>
+	</section>
+	
+<!-- 	<canvas class="chart chart-bar" chart-data="[['65', '59', '80', '81', '56', '55', '40']]" chart-labels="['2006', '2007', '2008', '2009', '2010', '2011', '2012']" chart-series="['Series A']"> -->
+<!-- 	</canvas> -->
+	
+	<div ng-include="page"></div>
+	
+	<section>
+		<div id="footer">
+		<p ng-bind-html="info.license"></p>
+		<p ng-bind-html="info.footer"></p>
+		</div>
+	</section>
+</div>
