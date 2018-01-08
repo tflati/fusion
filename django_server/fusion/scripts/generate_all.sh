@@ -1,0 +1,6 @@
+scripts/generate_transcripts_five_prime.sh > "data/transcripts5'.txt"
+scripts/generate_transcripts_three_prime.sh > "data/transcripts3'.txt"
+scripts/generate_exons_five_prime.sh > "data/exons5'.txt"
+scripts/generate_exons_three_prime.sh > "data/exons3'.txt"
+scripts/generate_genes_three_prime.sh > "data/genes3'.txt"
+scripts/generate_genes_five_prime.sh > "data/genes5'.txt"
