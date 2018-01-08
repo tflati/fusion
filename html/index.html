@@ -1,182 +1,681 @@
 <!DOCTYPE html>
-<html>
+<html ng-app="engine">
 <head>
-<meta charset="UTF-8">
-<meta http-equiv="Cache-control" content="no-cache">
-<meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no" />
-<link rel="stylesheet" href="bower_components/angular-material/angular-material.css">
 
-<link rel="stylesheet" href="bower_components/font-awesome/css/font-awesome.min.css">
-
-<!-- Angular -->
-<script src="bower_components/angular/angular.js"></script>
-<script src="bower_components/angular-aria/angular-aria.js"></script>
-<script src="bower_components/angular-animate/angular-animate.js"></script>
-<script src="bower_components/angular-material/angular-material.js"></script>
-<script src="bower_components/angular-sanitize/angular-sanitize.js"></script>
-
-<!-- Charts -->
-<script src="bower_components/chart.js/dist/Chart.js"></script>
-<script src="bower_components/angular-chart.js/angular-chart.js"></script>
-
-<!-- d3 -->
-<script src="lib/jquery.js"></script>
-<script src="lib/d3.js"></script>
-<script src="lib/biocircos-1.1.2.js"></script>
-
-<!-- TABLES -->
-<link href="bower_components/angular-material-data-table/dist/md-data-table.min.css" rel="stylesheet" type="text/css" />
-<script src="bower_components/angular-material-data-table/dist/md-data-table.js" type="text/javascript"></script>
-
-<style>
-.md-table tbody tr {
-	transition: all 0.1s ease-in;
-}
-
-.md-table tbody tr:hover {
-	cursor: pointer;
-	background-color: rgba(63, 81, 181, 0.2);
-}
-
-#toolbar {
-	background-color: #efefef;
-}
-
-.header-image {
-	margin-top: auto;
-	margin-bottom: auto;
-	width: auto;
-	height: auto;
-}
-
-.icon {
-	height: 32px;
-}
-
-.header-logo-container {
-	margin-left: auto;
-}
-
-.header-logo {
-	max-height: 85px;
-	width: auto;
-}
-
-.full-card {
-	margin-left: auto;
-	margin-right: auto;
-	max-height: 500px;
-	overflow-x: scroll;
-}
-
-.full-card-header {
-	overflow-x: auto;
-}
-
-.center {
-	margin-left: auto;
-	margin-right: auto;
-}
-
-.smaller-text {
-	font-size: 0.7em;
-}
-
-#footer {
-	background-color: #D7D7D7;
-	color: #6f6f6f;
-	font-weight: bolder;
-	text-align: center;
-	padding: 1em;
-	margin-top: 2em;
+	<meta charset="UTF-8">
 	
-/* 	bottom: 0; */
-/* 	position: absolute; */
-/* 	width: 100%; */
-}
-md-toolbar {
-	padding: 15px;
-	min-height: auto;
-}
+	<!-- Arbitrary tags -->
+	<!-- <meta property="og:type" content="{{ngMeta['og:type']}}" /> -->
+	<!-- <meta property="og:locale" content="{{ngMeta['og:locale']}}" /> -->
+	<!-- <meta name="author" content="{{ngMeta['author']}}" /> -->
+	<title ng-bind="ngMeta.title"></title>
+	<meta name="description" content="{{ngMeta.description}}" />
+	<meta name="robots" content="{{ngMeta.robots}}" />
+	
+	<base href="/interface-engine/">
+	<meta http-equiv="Cache-control" content="no-cache">
+	<meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no" />
+	
+	<!-- Font-Awesome, Angular and Angular Material -->
+<!-- 	<link rel="stylesheet" href="bower_components/components-font-awesome/css/font-awesome.min.css"> -->
+	<!-- <link rel="stylesheet" href="bower_components/angular-material-icons/angular-material-icons.css"> -->
+	<link rel="stylesheet" href="bower_components/angular-material/angular-material.css">
+	<link rel="stylesheet" href="bower_components/font-awesome/css/font-awesome.min.css">
+	
+	<!-- Paginated table -->
+	<link href="bower_components/md-data-table/dist/md-data-table-style.css" rel="stylesheet" type="text/css" />
+	<!-- jqCloud -->
+	<link rel="stylesheet" href="bower_components/jqcloud2/dist/jqcloud.min.css" type="text/css" />
+	<!-- Phylotree -->
+	<link rel="stylesheet" href="bower_components/phylotree/phylotree.css">
+	<!-- Toasts -->
+	<link href="bower_components/AngularJS-Toaster/toaster.min.css" rel="stylesheet" type="text/css" />
+	<!-- Tooltips -->
+	<link rel="stylesheet" href="bower_components/angular-tooltips/dist/angular-tooltips.min.css" />
+	
+	<style>
+	
+		.moccasin {
+			background-color: moccasin !important;
+		}
+		
+		.red {
+			background-color: red !important;
+		}
+		
+		.green {
+			background-color: green !important;
+		}
+		
+		.orange {
+			background-color: orange !important;
+		}
+		
+		label {
+			color: rgba(0, 0, 0, 0.5);
+		}
+		
+		md-checkbox .md-label {
+			white-space: nowrap;
+		}
+		
+		md-radio-button:last-child {
+			margin-bottom: 0px;
+		}
+		
+		md-content {
+			position: initial;
+			overflow: visible;
+		}
+		
+		md-content.md-big-data-theme-theme {
+			background-color: white;
+		}
+		
+		/* md-input-container { */
+		/* 	margin-bottom: 20px; */
+		/* } */
+		
+		
+	/* 	.tooltip-container { */
+	/* 		z-index: 9999; */
+	/* 	} */
+	
+	/* 	.custom-tooltip { */
+	/* 		text-align: center; */
+	/* 		min-width: 200px; */
+	/* 		margin-left: auto; */
+	/* 		margin-right: auto; */
+	/* 		background-color: #616161; */
+	/* 		border-radius: 10px; */
+	/* 		padding-top: 30px; */
+	/* 		padding-bottom: 30px; */
+	/* 		padding-left: 30px; */
+	/* 		padding-right: 30px; */
+	/* 		color: white; */
+	/* 		font-weight: bold; */
+	/* 	} */
+		
+	/* 	.custom-tooltip-small { */
+	/* 		text-align: center; */
+	/* 		min-width: 400px; */
+	/* 		margin-left: auto; */
+	/* 		margin-right: auto; */
+	/* 		background-color: #616161; */
+	/* 		border-radius: 10px; */
+	/* 		padding-top: 2px; */
+	/* 		padding-bottom: 2px; */
+	/* 		padding-left: 5px; */
+	/* 		padding-right: 5px; */
+	/* 		color: white; */
+	/* 		font-weight: bold; */
+	/* 		font-size: 11pt; */
+	/* 	} */
+	
+		.angular-tooltip {
+			text-align: center;
+	 		min-width: 200px;
+	 		max-width: 500px;
+	 		margin-left: auto;
+	 		margin-right: auto; 
+	 		background-color: #616161; 
+	 		border-radius: 10px; 
+	 		padding-top: 30px; 
+	 		padding-bottom: 30px; 
+	 		padding-left: 30px; 
+	 		padding-right: 30px; 
+	 		color: white;
+	 		font-weight: bold;
+	 		border: 2px solid #F1F1F1;
+		}
+		
+		.margin-left-small {
+			margin-left: 10px;
+		}
+		
+		.md-row {
+			height: 48px;
+		}
+		
+		/* .md-table tbody tr:hover { */
+		/* 	cursor: pointer; */
+		/* 	background-color: rgba(63, 81, 181, 0.2); */
+		/* } */
+		
+		#toolbar {
+			background-color: #efefef;
+		}
+		
+		/* table { */
+		/* 	word-wrap: break-word; */
+		/* } */
+		
+		table {
+			border-spacing: 0;
+			width: 100%;
+		}
+		
+		md-select-menu {
+			min-width: 200px;
+		}
+		
+		/* td { */
+		/* 	text-align: center !important; */
+		/* } */
+		
+		th {
+			text-align: center;
+	/* 		max-width: 100px; */
+			white-space: no-wrap !important;
+			padding-left: 10px !important;
+		}
+		
+		td {
+			padding: 5px;
+			border-top: 1px solid #e0e0e0;
+			padding-left: 10px !important;
+		}
+		
+		tr:hover {
+			background-color: #f1f1f1;
+		}
+		
+	/* 	[ng-dropover] { */
+	/* 	  display: inline-block; */
+	/* 	} */
+		
+		table tr:nth-child(odd) { 
+		  background-color: #ffffff; 
+		}
+		table tr:nth-child(even) { 
+		  background-color: #f1f1f1; 
+		} 
+		
+		/* th { */
+		/* 	overflow-wrap: break-word; */
+		/* 	max-width: 300px; */
+		/* } */
+		
+		my-table {
+			width: 100%;
+		}
+		
+	/* 	img { */
+	/* 		max-width: 100%; */
+	/* 	} */
+		
+		.header-image {
+			margin-top: auto;
+			margin-bottom: auto;
+			width: auto;
+			height: auto;
+		}
+		
+		.icon {
+			height: 32px;
+		}
+		
+		.fa {
+			vertical-align: middle;
+		}
+		
+		.header-logo-container {
+			margin-left: auto;
+		}
+		
+		.header-logo {
+			height: 85px;
+			width: auto;
+		}
+		
+		.header-logo-container-menu {
+			margin-left: auto;
+			display: inline-block;
+			vertical-align: middle;
+		}
+		
+		.header-logo-menu {
+			height: 45px;
+			width: auto;
+			padding: 0px 0px 0px 10px !important;
+			vertical-align: middle;
+		}
+		
+		.img-disabled {
+			filter: grayscale(100%);
+		}
+		
+		.disabled {
+			color: grey
+		}
+		
+		.auto-height {
+			height: auto;
+		}
+		
+		.padding-v-small {
+			padding-top: 5px !important;
+			padding-bottom: 5px !important;
+		}
+		
+		.padding-v-no {
+			padding-top: 0px !important;
+			padding-bottom: 0px !important;
+		}
+		
+		.full-card {
+			margin-left: auto;
+			margin-right: auto;
+			max-height: 500px;
+		 	overflow-x: scroll;
+		}
+		
+		.full-card-header {
+			overflow-x: auto;
+		}
+		
+		.center {
+			margin-left: auto;
+			margin-right: auto;
+		}
+		
+		.smaller-text {
+			font-size: 0.7em;
+		}
+		
+		.full-page {
+			min-height: 100%;
+		}
+		
+		.divider {
+			margin-top: 2px;
+			margin-bottom: 2px;
+			width: 100%;
+		}
+		
+		.spacer {
+			height: 1em;
+		}
+		
+		.md-chips{
+		  box-shadow: 0 0px !important;
+		}
+		
+		#footer {
+			background-color: #D7D7D7;
+			color: #6f6f6f;
+			font-weight: bolder;
+			text-align: center;
+			padding: 1em;
+			margin-top: 2em;
+		}
+		
+		/* .footer-search { */
+		/*  	bottom: 0; */
+		/*  	position: absolute; */
+		/*  	width: 100%; */
+		/* } */
+		
+		.text-alignment-justify {
+			text-align: justify;
+		}
+		.text-alignment-right {
+			text-align: right;
+		}
+		.text-alignment-center {
+			text-align: center;
+		}
+		
+		md-toolbar {
+			padding: 15px;
+			min-height: auto;
+		}
+		
+		md-menu button {
+			font-size: 16px;
+		}
+		
+		.node {
+			font-size: 14px;
+		}
+		
+		#d3_layout_phylotree_context_menu {
+			list-style-type: none;
+			padding: 10px 30px;
+			background-color: #fff;
+			border: 1px solid rgba(0,0,0,0.15);
+			border-radius: 4px;
+			box-shadow: 0 6px 12px rgba(0,0,0,0.175);
+		}
+		
+		#d3_layout_phylotree_context_menu .divider {
+			height: 1px;
+			margin: 9px 0;
+			overflow: hidden;
+			background-color: #e5e5e5;
+		}
+		
+		#d3_layout_phylotree_context_menu li {
+			list-style-type: none;
+		}
+		
+		#d3_layout_phylotree_context_menu a:hover {
+			cursor: pointer;
+		}
+		
+		#d3_layout_phylotree_context_menu li.dropdown-header {
+			font-size: 0.8em;
+			color: #999;
+			margin: 5px 0px 5px 0px;
+		}
+		
+		.pedix {
+			position: relative;
+		}
+		.pedix-image {
+			position: absolute;
+			max-width: 50px;
+			max-height: 50px;
+			top: 10px;
+			margin: 5px 0px 0px 5px;
+		}
+		
+		.button-icon {
+			display: inline-block;
+			vertical-align: middle;
+			max-width: 50px;
+			max-height: 50px;
+			margin-left: 5px;
+		}
+		
+		.right {
+			margin-left: auto;
+		}
+		
+		hr {
+			border-style: inset;
+			border-width: 1px;
+			display: block;
+			color: lightgray;
+		}
+		
+		.md-dialog-backdrop:nth-of-type(odd) {
+		    z-index: 80;
+		}
+		.md-dialog-container:nth-of-type(even) {
+		    z-index: 81;
+		}
+		
+		.md-dialog-backdrop:nth-of-type(even) {
+		    z-index: 82;
+		}
+		.md-dialog-container:nth-of-type(odd) {
+		    z-index: 83;
+		}
+		
+		.md-tooltip {
+		    font-size: 0.8em;
+		}
+		
+		/* .table-scroll thead { */
+		/*     display: table; */
+		/*     width: 100%; */
+		/*     table-layout: fixed; */
+		/* } */
+		
+		/* .table-scroll tbody { */
+		/*     max-height: 300px; */
+		/*     overflow-y: auto; */
+		/*     display: block; */
+		/*     width: 100%; */
+		/*     table-layout: fixed; */
+		/* } */
+		
+		/* .table-scroll tr { */
+		/*     display: table; */
+		/*     table-layout: fixed; */
+		/*     width: 100%; */
+		/* } */
+		
+		/* .table-scroll td { */
+		/*     height: 47px; */
+		/* } */
+	
+	</style>
+</head>
 
-md-menu button {
-	font-size: 16px;
-}
+<body style="margin: 0px;" md-theme="big-data-theme">
+	
+	<toaster-container toaster-options="{'position-class': 'toast-bottom-right'}"></toaster-container>
+	
+	<div ng-view></div>
+	
+	<!-- Angular -->
+	<script type="text/javascript" src="bower_components/angular/angular.min.js"></script>
+	<script type="text/javascript" src="bower_components/angular-aria/angular-aria.min.js"></script>
+	<script type="text/javascript" src="bower_components/angular-animate/angular-animate.min.js"></script>
+	<script type="text/javascript" src="bower_components/angular-material/angular-material.min.js"></script>
+	<script type="text/javascript" src="bower_components/angular-material-icons/angular-material-icons.min.js"></script>
+	<script type="text/javascript" src="bower_components/angular-sanitize/angular-sanitize.min.js"></script>
+	<script type="text/javascript" src="bower_components/angular-route/angular-route.min.js"></script>
+	<script type="text/javascript" src="bower_components/angular-cookies/angular-cookies.min.js"></script>
 
-</style>
+	<!-- Paginated table -->
+	<script type="text/javascript" src="bower_components/jquery/dist/jquery.min.js"></script>
+	<script src="bower_components/md-data-table/dist/md-data-table.js" type="text/javascript"></script>
+	<script src="bower_components/md-data-table/dist/md-data-table-templates.js" type="text/javascript"></script>
+	<script type="text/javascript" src="bower_components/lodash/lodash.min.js"></script>
+	
+	<!-- jqCloud -->
+	<script type="text/javascript" src="bower_components/jqcloud2/dist/jqcloud.min.js"></script>
+	<script type="text/javascript" src="bower_components/angular-jqcloud/angular-jqcloud.js" ></script>
+	
+	<!-- Charts -->
+	<script type="text/javascript" src="bower_components/chart.js/dist/Chart.min.js"></script>
+	<script type="text/javascript" src="bower_components/angular-chart.js/dist/angular-chart.min.js"></script>
+	
+	<!-- d3 -->
+	<script type="text/javascript" src="bower_components/d3/d3.min.js"></script>
+	
+	<!-- Phylotree -->
+	<script type="text/javascript" src="bower_components/phylotree/phylotree.js"></script>
+	
+	<!-- biocircos -->
+	<script type="text/javascript" src="lib/biocircos-1.1.2.js"></script>
+	
+	<!-- Toasts -->
+	<script src="bower_components/AngularJS-Toaster/toaster.min.js"  type="text/javascript"></script>
+	
+	<!-- Venn -->
+	<script src="bower_components/venn.js/venn.js"></script>
+	<script src="bower_components/angular-venn/angular-venn.js"></script>
+	
+	<!-- Google Analytics -->
+	<script src="bower_components/angular-google-analytics/dist/angular-google-analytics.min.js"></script>
+	
+	<!-- ngMeta -->
+	<script src="bower_components/ngMeta/dist/ngMeta.min.js"></script>
+	
+	<!-- Tooltips -->
+	<script src="bower_components/angular-tooltips/dist/angular-tooltips.min.js"></script>
+	
+	<!-- File(s) upload -->
+	<script src="bower_components/ng-file-upload/ng-file-upload-shim.min.js"></script> <!-- for no html5 browsers support -->
+	<script src="bower_components/ng-file-upload/ng-file-upload.min.js"></script>
 
-<script>
+	<script type="text/javascript">
 
-			var app = angular.module( 'app', [ 'ngMaterial', 'ngSanitize', 'chart.js', 'md.data.table'] );
+			var app = angular.module( 'engine',
+					[
+						'ngMaterial',
+						'ngSanitize',
+						'chart.js',
+						'ngAnimate',
+						'mdDataTable',
+						'toaster',
+						'angular-jqcloud',
+						'ngRoute',
+						'ngMdIcons',
+						'angular-venn',
+						'tooltips',
+						'ngCookies',
+						'angular-google-analytics',
+						'ngMeta',
+						'ngFileUpload'
+					] );
 			
-// 			app.run(['$templateCache', function ( $templateCache ) {
-// 				    $templateCache.removeAll(); }]);
+// 			app.run(function ( $templateCache ) { $templateCache.removeAll(); });
 			
-			app.config(function($mdThemingProvider) {
+			app.config(function($mdThemingProvider, $httpProvider) {
+				
+				$httpProvider.defaults.headers.post['Content-Type'] = 'application/json;charset=utf-8';
+				$httpProvider.defaults.xsrfCookieName = 'csrftoken';
+				$httpProvider.defaults.xsrfHeaderName = 'X-CSRFToken';
+				
 					$mdThemingProvider.theme('big-data-theme')
 					      .primaryPalette('amber')
 					      .accentPalette('red')
 					      .warnPalette('light-green');
 				});
-		</script>
-		
-		<script src="components/services/global.js" type="text/javascript"></script>
-		<script src="components/button/buttonDirective.js" type="text/javascript"></script>
-		<script src="components/button/buttonController.js" type="text/javascript"></script>
-		<script src="components/element/elementController.js" type="text/javascript"></script>
-		<script src="components/element/elementDirective.js" type="text/javascript"></script>
-		<script src="components/card/cardController.js" type="text/javascript"></script>
-		<script src="components/card/cardDirective.js" type="text/javascript"></script>
-		
-		<script src="main.js" type="text/javascript"></script>
-</head>
-
-<body style="margin: 0px; font-size: 1.2em;" ng-app="app"
-	md-theme="big-data-theme">
-
-<!-- 	<card ng-controller="cardController" ng-init="init({title: 'Title', type: 'PieChart', footer: {label: 'Footer label', data: [1, 2, 3, 4, 5], pluralize: true, prefixFunction: 'total'}})"></card> -->
+				
+			app.config(['AnalyticsProvider', function (AnalyticsProvider) {
+				   AnalyticsProvider.setAccount('UU-XXXXXXX-X');  //UU-XXXXXXX-X should be your tracking code
+				   AnalyticsProvider
+				      .delayScriptTag(true)
+	// 			      .ignoreFirstPageLoad(true)
+	// 			      .trackPages(true)
+	// 			      .trackUrlParams(true)
+				      .setPageEvent('$stateChangeSuccess')
+	// 			      .logAllCalls(false)
+	// 			      .setDomainName('none')
+				      ;
+				      
+				}]).run(['Analytics', function(Analytics) { }]);
+			
+			app.directive('customChip', function(){
+				  return {
+				    restrict: 'A',
+				    link: function(scope, elem, attrs) {
+				      var color = scope.$chip.background_color;
+				      var mdChip = elem.parent().parent();
+				      mdChip.addClass(color);
+				    }
+				  }
+				});
+	</script>
 	
-	<div ng-controller="controller as ctrl" layout="column" ng-cloak>
+	<script src="components/services/message.js" type="text/javascript"></script>
+	<script src="components/services/global.js" type="text/javascript"></script>
+	<script src="components/services/configFileService.js" type="text/javascript"></script>
+	
+	<script src="components/button/buttonDirective.js" type="text/javascript"></script>
+	<script src="components/button/buttonController.js" type="text/javascript"></script>
+	
+	<script src="components/element/cloudController.js" type="text/javascript"></script>
+	<script src="components/circos/circosController.js" type="text/javascript"></script>
+	<script src="components/tree/treeController.js" type="text/javascript"></script>
+	
+	<script src="components/element/elementController.js" type="text/javascript"></script>
+	<script src="components/element/elementDirective.js" type="text/javascript"></script>
+	
+	<script src="components/card/cardController.js" type="text/javascript"></script>
+	<script src="components/card/cardDirective.js" type="text/javascript"></script>
 
-		<md-toolbar class="md-menu-toolbar" id="toolbar">
-		<div layout="row">
-			<div>
-				<md-menu-bar> <md-menu
-					ng-repeat="item in ctrl.info.menu">
-				<button ng-click="item.items ? $mdOpenMenu() : ctrl.goTo(item)">
-					{{item.name}}</button>
-				<md-menu-content> <md-menu-item
-					ng-repeat="subitem in item.items"> <md-button
-					ng-click="ctrl.goTo(subitem)"> {{subitem.name}} </md-button> </md-menu-item> </md-menu-content>
-				</md-menu> </md-menu-bar>
-			</div>
-		</div>
-		</md-toolbar>
+	<script src="components/autocomplete/autocompleteController.js" type="text/javascript"></script>
+	
+	<!-- Custom table -->
+	<script src="components/table/myTable.js" type="text/javascript"></script> 
+	<script src="components/table/my_custom_element/myCustomElement.js" type="text/javascript"></script>
+	
+	<script type="text/javascript">
+		
+		app.config(function ($routeProvider, $locationProvider, ngMetaProvider) {
+			
+			console.log("ROUTING", $routeProvider, $locationProvider);
+			
+			ngMetaProvider.useTitleSuffix(true);
+			
+		    $routeProvider.
+		    when("/popup", {
+		    	templateUrl: "components/card/popup.html"
+		    }).
+		    when("/:pageName?/:parameters*?", {
+		        templateUrl: "homepage.html",
+		        controller: "pageController",
+		        resolve: {
+		            info: function(configFileService){
+		            	console.log("[ROUTE] [RESOLVE] [CONFIG]");
+		                return configFileService.get_config_file();
+		            },
+		            pageTitle: function($route){
+		            	console.log("[ROUTE] [RESOLVE] [PAGE_TITLE]", $route.current.params.pageName, $route);
+		            	
+		            	// if ($route.current.params.pageName == undefined) $route.current.params.pageName = "main";
+		            	
+		            	return $route.current.params.pageName;
+		            }
+		        }
+		    })
+// 			    .otherwise({
+// 			    	templateUrl: "homepage.html",
+// 			        controller: "pageController",
+// 			        resolve: {
+// 			            info: function(configFileService){
+// 			                return configFileService.get_config_file();
+// 			            },
+// 			            pageTitle: function($route){
+// 			            	console.log("ASKED FOR SPECIAL CASE");
+// 			            	return undefined;
+// 			            }
+// 			        }
+// 			    })
+		    ;
+			    
+		    $locationProvider.html5Mode(true);
+		    $locationProvider.html5Mode({
+	            enabled: true,
+	            requireBase: false
+	        });
 
-		<section layout="row" flex="100">
-			<md-card layout="row" class="full-card full-card-header">
-			    <img ng-src="{{ctrl.info.image.src}}" class="md-card-image header-image" style="max-height:{{ctrl.info.image.percentage_width}}px;">
-				<md-card-title layout="column">
-					<md-card-title-text layout="column">
-						<span class="md-headline" style="font-size: 2em;" ng-bind="ctrl.info.title"></span>
-						<span class="md-subhead" ng-bind-html="ctrl.info.description"></span>
-							
-						<md-card-title-media ng-if="ctrl.header.show_logos" layout="row" class="header-logo-container" flex="auto" layout-padding>
-							<img class="header-logo" ng-repeat="logo in ctrl.info.logos" ng-src="{{logo.image}}">
-						</md-card-title-media>
-					</md-card-title-text>
-				</md-card-title>
-			</md-card>
-		</section>
-		
-		<div ng-include="ctrl.page"></div>
-		
-		<section>
-			<div id="footer">
-			<p>Developed by Cineca</p>
-			</div>
-		</section>
-	</div>
+		    $locationProvider.hashPrefix("!").html5Mode(true);
+		});
+			
+		app.run([
+			  '$rootScope', '$route', 'ngMeta',
+			  function($rootScope, $route, ngMeta) {
+			    // see what's going on when the route tries to change
+			    $rootScope.$on('$routeChangeStart', function(event, next, current) {
+			      // next is an object that is the route that we are starting to go to
+			      // current is an object that is the route where we are currently
+			      var currentPath = undefined;
+			      if(current != undefined) currentPath = current.originalPath;
+			      var nextPath = next.originalPath;
+
+			      console.log("Current", current);
+			 	  console.log("Next", next);
+			 	  console.log("Event", event);
+			      console.log('Starting to leave %s to go to %s', currentPath, nextPath, $route);
+			    });
+			    
+			    $rootScope.$on("$routeChangeSuccess", function(event){
+			    	console.log("ROUTE CHANGE SUCCESS", event);
+			    });
+			    
+			    $rootScope.$on("$routeChangeError", function(event){
+			    	console.log("ROUTE CHANGE ERROR", event);
+			    });
+			    
+			    $rootScope.$on("$routeUpdate", function(event){
+			    	console.log("ROUTE UPDATE", event);
+			    });
+			    
+			    ngMeta.init();
+			  }
+			]);
+	</script>
+	
+	<script src="main.js" type="text/javascript"></script>
+	
 </body>
 
 </html>

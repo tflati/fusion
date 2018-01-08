@@ -1,90 +1,18 @@
 <section style="padding: 0% 5% 0% 5%;">
-	<p ng-bind-html="ctrl.info.long_description"></p>
+	<p  ng-if="get_current_page_data().show_description == undefined || get_current_page_data().show_description == true"
+		ng-class="{'text-alignment-justify': info.long_description_alignment == 'justify', 'text-alignment-right': info.long_description_alignment == 'right', 'text-alignment-center': info.long_description_alignment == 'center'}"
+		ng-bind-html="get_current_page_data().long_description">
+	</p>
 </section>
 
-<section layout="row" flex="100" style="width:80%; margin-left: auto; margin-right: auto;">
+<div ng-if="sending" layout="row" layout-sm="column" layout-align="space-around">
+  <md-progress-circular md-mode="indeterminate"></md-progress-circular>
+</div>
 
-	<md-card>
-		<md-card-title style="text-align: center;">Global summary</md-card-title>
-		<md-card-content>
-		    
-		    <table md-table md-row-select multiple>
-				<tbody md-body>
-					<tr md-row md-auto-select ng-repeat="label in data.header track by $index">
-						<td md-cell style="font-weight: bold;"><span>{{label}}</span></td>
-						<td md-cell style="text-align: right;"><span>{{data.items[0][$index]}}</span></td>
-					</tr>
-				</tbody>
-		    </table>
-		    
-		</md-card-content>
-	</md-card>
-
-	<div layout="column" flex="30">
-		
-		<md-card>
-			<md-card-title>Fusion events by chromosome</md-card-title>
-			<md-card-content>
-			<canvas style="font-size:10em;" id="doughnut" class="chart chart-doughnut"
-					chart-data="piedata"
-					chart-labels="pielabels"
-					chart-click="pieclick"
-					chart-options="pieoptions">
-			</canvas>
-			</md-card-content>
-			<md-divider></md-divider>
-			<md-card-footer>
-				<span ng-bind="piedata.length"></span>
-    			<span> </span>
-    			<span ng-bind="pieheader[0]"></span><span ng-if="pieheader.length > 0">s</span>
-    		</md-card-footer>
-		</md-card>
-		
+<section layout="column" flex="100" style="width:{{pageInfo.width}}; margin-left: auto; margin-right: auto;">
+	<div layout="row" ng-repeat="row in get_current_page_data().elements track by $index">
+		<card ng-repeat="card in row" ng-controller="cardController" ng-init="init(card)" flex="{{card.width}}" ng-class="{right: card.alignment == 'right'}">
+		</card>
 	</div>
-	
-	<div layout="column" flex="30">
-	
-		<md-card>
-			<md-card-title style="text-align: center;">Summary for chromosome {{ctrl.clicked_chromosome}}</md-card-title>
-			<md-card-content>
-				<table md-table md-row-select multiple>
-					<tbody md-body>
-						<tr md-row md-auto-select ng-repeat="label in subdata.header track by $index">
-							<td md-cell style="font-weight: bold;"><span>{{label}}</span></td>
-							<td md-cell style="text-align: right;"><span>{{subdata.items[$index]}}</span></td>
-						</tr>
-					</tbody>
-	    		</table>			    
-			</md-card-content>
-		</md-card>
-	</div>
-</section>
 
-<section layout="row" flex="100" class="center" style="width:80%;">
-
-	<md-card class="full-card full-card-header">
-		<md-card-title style="text-align: center;">{{ctrl.circos.events[2].length}} fusion events for cell line &nbsp;
-			<md-select style="margin: 0px;" ng-change="ctrl.show_circos('http://localhost/api/fusion/cell_line_events/' + ctrl.circos.value + '/')" ng-init="ctrl.load_circos('http://localhost/api/fusion/cell_lines/')" ng-model="ctrl.circos.value" ng-model-options="{trackBy: '$value.id'}">
-				<md-option ng-value="value" ng-repeat="value in ctrl.circos.values track by $index">{{value}}</md-option>
-			</md-select>
-		</md-card-title>
-		
-		<md-card-content>
-			<p class="smaller-text">
-				<span class="fa-stack">
-				  <i class="fa fa-circle-o fa-stack-2x"></i>
-				  <i class="fa fa-info fa-stack-1x"></i>
-				</span>
-				<span>
-					Ticks in the plot correspond to about 30 million bases
-				</span>
-			</p>
-			
-			<div ng-if="ctrl.sending" style="text-align: center; color: cadetblue;">
-        		<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i>
-    		</div>
-			
-		   	<div style="font-size: 0.5em;" id="biocircos"></div>
-		</md-card-content>
-	</md-card>
 </section>
