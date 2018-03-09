@@ -23,7 +23,7 @@ app.controller("cardController", function($scope, $window, $rootScope, dataServi
 //		$scope.elements = data.elements;
 //		$scope.layout = data.layout;
 		
-		if(!$scope.card.show) $scope.card.show = true;
+		if(!$scope.card.show_conditions) $scope.card.show = true;
 		
 //		$scope.show = true;
 //		if (data.show == false) $scope.show = false;
@@ -46,14 +46,14 @@ app.controller("cardController", function($scope, $window, $rootScope, dataServi
 //			}, true);
 //		}
 		
-		for(var i=0; i < $scope.card.show.length; i++)
+		for(var i=0; i < $scope.card.show_conditions.length; i++)
 		{
-			var condition = $scope.card.show[i];
+			var condition = $scope.card.show_conditions[i];
 			var arg1 = condition.arg1;
 			if(arg1.key){
 				console.log("CARD SHOW ADDING WATCH TO ", arg1);
 				$scope.$watch(function(){return dataService.global[arg1.key];}, function(newValue, oldValue) {
-					console.log("WATCH CARD SHOW", oldValue, newValue);
+					console.log("WATCH CARD SHOW ARG1", oldValue, newValue);
 					condition.arg1.value = newValue;
 //					if(newValue != oldValue)
 						$scope.updateShow(condition);
@@ -65,21 +65,20 @@ app.controller("cardController", function($scope, $window, $rootScope, dataServi
 			if(arg2.key){
 				console.log("CARD SHOW ADDING WATCH TO ", arg2);
 				$scope.$watch(function(){return dataService.global[arg2.key];}, function(newValue, oldValue) {
-					console.log("WATCH CARD SHOW", oldValue, newValue);
+					console.log("WATCH CARD SHOW ARG2", oldValue, newValue);
 					condition.arg2.value = newValue;
 //					if(newValue != oldValue)
 						$scope.updateShow(condition);
 				});
 			}
 			
-//			$scope.updateShow(condition);
+			$scope.updateShow(condition);
 		}
 		
 		console.log("CARD DATA: ", data);
 	};
 	
 	$scope.updateShow = function(condition){
-		console.log("WATCH CARD SHOW UPDATE", condition);
 		
 		var arg1 = condition.arg1;
 		if(arg1 == "undefined") arg1 = undefined;
@@ -97,6 +96,8 @@ app.controller("cardController", function($scope, $window, $rootScope, dataServi
 		else if(condition.op == "<") show = arg1 < arg2;
 		else if(condition.op == "<=") show = arg1 <= arg2;
 		else if(condition.op == "==") show = arg1 == arg2;
+		
+		console.log("WATCH CARD SHOW UPDATE", show, condition, arg1, arg2);
 		
 		$scope.card.show = show;
 	};

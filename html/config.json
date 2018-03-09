@@ -2,7 +2,7 @@
 	"title": "LiGeA: a comprehensive database of human gene fusion events",
 	"title_short": "LiGeA",
 	"description": "LiGeA (cancer cell LInes GEne fusions portAl) provides an easy access to a comprehensive database designed for storing, displaying and annotating Human Cell Line-specific gene fusion events detected from RNA-seq data.",
-	"license": "<a rel=\"license\" href=\"http://creativecommons.org/licenses/by-nc/4.0/\"><img alt=\"Creative Commons License\" style=\"border-width:0\" src=\"https://i.creativecommons.org/l/by-nc/4.0/88x31.png\" /></a><br />This work is licensed under a <a rel=\"license\" href=\"http://creativecommons.org/licenses/by-nc/4.0/\">Creative Commons Attribution-NonCommercial 4.0 International License</a>.",
+	"license": "<a rel=\"license\" href=\"https://opensource.org/licenses/GPL-3.0\"><img alt=\"Creative Commons License\" style=\"border-width:0\" src=\"https://opensource.org/files/osi_keyhole_300X300_90ppi_0.png\" width=\"80px\"/></a><br />This work is licensed under a <a rel=\"license\" href=\"https://opensource.org/licenses/GPL-3.0\">https://opensource.org/licenses/GPL-3.0</a>.",
 	"analytics_tracking_ID": "UA-107089466-1",
 	"meta": [{
 			"key": "robots",
@@ -117,7 +117,6 @@
 				[
 					{
 						"width": "100",
-						"show": false,
 						"elements": [
 							{
 								"type": "image",
@@ -619,7 +618,7 @@
 						"elements": [
 							{
 								"type": "button",
-								"label": "See PML/RARA fusion event",
+								"label": "See PML/RARA fusion event in NB4 cell line",
 								"action": "link",
 								"data": {
 									"image": "fusionevent-icon.png",
@@ -630,7 +629,7 @@
 							},
 							{
 								"type": "button",
-								"label": "See BCR/ABL1 fusion event",
+								"label": "See BCR/ABL1 fusion event in SUPB15 cell line",
 								"action": "link",
 								"data": {
 									"image": "fusionevent-icon.png",
@@ -641,7 +640,7 @@
 							},
 							{
 								"type": "button",
-								"label": "See FGFR3/TACC3 fusion event",
+								"label": "See FGFR3/TACC3 fusion event in RT4 cell line",
 								"action": "link",
 								"data": {
 									"image": "fusionevent-icon.png",
@@ -710,12 +709,12 @@
 						]
 					},
 					{
-						"title": "Number of predicted gene fusion events",
+						"title": "Number of predicted Gene Fusion Events",
 						"width": "40",
 						"elements": [{
 							"type": "two-column-table",
 							"data": {
-							    "value": "Please refer to the predicted gene fusion events as the entity constituted by the gene fusion couple in a specific cell line. This table reports the details for each algorithm and the amount of the intersection.",
+							    "value": "Please refer to the predicted Gene Fusion Events as the entity constituted by the gene fusion couple in a specific cell line. This table reports the details for each algorithm and the amount of the intersection.",
 								"url": "/fusion_api/fusion/algorithms_statistics/ALGORITHMS/",
 								"templates": [{
 									"template": "ALGORITHMS",
@@ -979,7 +978,7 @@
 			"long_description": "On the left, a dynamical pie-chart showing the number of per chromosome gene fusion events (GFE); by clicking on each slice of the pie, the summary table on the right automatically updates.",
 			"elements": [
 				[{
-						"title": "Per chromosome  gene fusion events",
+						"title": "Per chromosome Gene Fusion Events (GFE)",
 						"subtitle": "Distribution of fusion events per chromosome normalized by the length of the chromosome.",
 						"width": "50",
 						"elements": [{
@@ -1046,7 +1045,7 @@
 			"title": "Disease statistics",
 			"elements": [
 				[{
-						"title": "Per disease fusion events",
+						"title": "Per disease Gene Fusion Events (GFE)",
 						"width": "50",
 						"subtitle": "In this panel, the cell lines derived from the same disease have been grouped together. The resulting pie-chart shows the total number of fusion events normalized for a specific disease.",
 						"elements": [{
@@ -1139,8 +1138,8 @@
 			"title": "Database statistics",
 			"elements": [
 				[{
-					"title": "Characterization of predicted gene fusion events (pGFEs) by their annotation",
-					"subtitle": "Only events supported by all the three algorithms are considered - Consensus Call Set (CCS). 47% (purple) of the CCS has not been previously described in any other database or scientific publication; 10.3% (red) and 18% (green) of the CCS have been reported in databases from healthy/tumoral samples thus representing the portion of false and true positive subset of our analysis; 1% of the CCS (orange) reports tags which classify the pGFE as a false positive couple with medium probability; 22.5% (grey) of the results represent novel pGFEs tagged with values which classify them as both false and true positives.",
+					"title": "Characterization of predicted Gene Fusion Events (pGFEs) by their annotation",
+					"subtitle": "Only events supported by all the three algorithms are considered - Consensus Call Set (CCS). 39.7% (purple) of the CCS has not been previously described in any other database or scientific publication; 9.7% (red) and 17.7% (green) of the CCS have been reported in databases from healthy/tumoral samples thus representing the portion of false and true positive subset of our analysis; 1% of the CCS (orange) reports tags which classify the pGFE as a false positive couple with medium probability; 32% (grey) of the results represent novel pGFEs tagged with values which classify them as both false and true positives.",
 					"width": "50",
 					"elements": [{
 						"type": "chart-pie",
@@ -1183,7 +1182,7 @@
 						{
 							"type": "venn",
 							"data": {
-								"url": "/fusion_api/fusion/get_external_database_statistics/DATABASES/",
+								"url": "/fusion_api/fusion/get_external_database_statistics/DATABASES/false/",
 								"templates": [{
 									"template": "DATABASES",
 									"key": "databases"
@@ -1198,7 +1197,64 @@
 					"elements": [{
 						"type": "table",
 						"data": {
-							"url": "/fusion_api/fusion/get_external_database_statistics_details/DATABASES/",
+							"url": "/fusion_api/fusion/get_external_database_statistics_details/DATABASES/false/",
+							"templates": [{
+								"template": "DATABASES",
+								"key": "databases"
+							}]
+						}
+					}]
+				}],
+				[{
+					"title": "Intersection of CCS with existing databases",
+					"subtitle": "This information is available only for FusionCatcher's events",
+					"width": "100",
+					"elements": [{
+							"type": "paragraph",
+							"data": {
+								"value": "Please select one or more databases:"
+							}
+						},
+						{
+							"type": "checkbox",
+							"subtype": "form",
+							"inline": true,
+							"label": "Databases",
+							"data": {
+								"values": [
+									{"id": "chimerdb2", "label": "<img width='80px' src='chimerdb.logo.png' alt='chimerdb'>", "checked": true},
+									{"id": "cosmic", "label": "<img flex flex-align='center center' width='50px' src='cosmic-icon.png' alt='cosmic'><br/><span>Cosmic</span>", "checked": true},
+									{"id": "tcga", "label": "<img width='80px' src='http://ciriellolab.org/images/tcga_logo.gif' alt='tcga'>", "checked": true},
+									{"id": "gtex", "label": "<img width='50px' src='http://phoenixrising.me/wp-content/uploads/gtex.jpg' alt='gtex'>", "checked": true},
+									{"id": "oncogene", "label": "oncogene", "checked": true},
+									{"id": "ticdb", "label": "<img width='80px' src='http://www.unav.es/genetica/logo.jpg' alt='ticdb'>", "checked": true}
+								],
+								"multiple": true,
+								"onClick": [{
+									"action": "write",
+									"key": "databases"
+								}]
+							}
+						},
+						{
+							"type": "venn",
+							"data": {
+								"url": "/fusion_api/fusion/get_external_database_statistics/DATABASES/true/",
+								"templates": [{
+									"template": "DATABASES",
+									"key": "databases"
+								}]
+							}
+						}
+					]
+				}],
+				[{
+					"title": "Number of fusion events contained in known databases (CCS)",
+					"subtitle": "This information is available only for FusionCatcher's events",
+					"elements": [{
+						"type": "table",
+						"data": {
+							"url": "/fusion_api/fusion/get_external_database_statistics_details/DATABASES/true/",
 							"templates": [{
 								"template": "DATABASES",
 								"key": "databases"
@@ -1550,7 +1606,7 @@
 				[
 					{
 						"title": "Search",
-						"show": [
+						"show_conditions": [
 							{
 								"arg1": {"key": "search_started", "fx": "value"},
 								"op": "==",
@@ -1635,7 +1691,7 @@
 					{
 						"title": "Summary of your search",
 						"layout": "row",
-						"show": [
+						"show_conditions": [
 							{
 								"arg1": {"key": "search_started", "fx": "value"},
 								"op": "==",
@@ -1671,7 +1727,7 @@
 				[
 					{
 						"title": "Results",
-						"show": [
+						"show_conditions": [
 							{
 								"arg1": {"key": "search_started", "fx": "value"},
 								"op": "==",
@@ -1689,6 +1745,17 @@
 											"key": "num_results"
 										}
 									]
+								}
+							},
+							{
+								"type": "button",
+								"label": "Download results",
+								"data": {
+									"onClick": "/fusion_api/fusion/download_disease/",
+									"icon": "fa-table",
+									"modifiers": "fa-2x",
+									"action": "send",
+									"source": "search_for_disease"
 								}
 							},
 							{
@@ -1984,7 +2051,7 @@
 					{
 						"title": "Search",
 						"layout": "row",
-						"show": [
+						"show_conditions": [
 							{
 								"arg1": {"key": "search_started", "fx": "value"},
 								"op": "==",
@@ -2069,7 +2136,7 @@
 					{
 						"title": "Summary of your search",
 						"layout": "row",
-						"show": [
+						"show_conditions": [
 							{
 								"arg1": {"key": "search_started", "fx": "value"},
 								"op": "==",
@@ -2105,7 +2172,7 @@
 				[
 					{
 						"title": "Results",
-						"show": [
+						"show_conditions": [
 							{
 								"arg1": {"key": "search_started", "fx": "value"},
 								"op": "==",
@@ -2429,7 +2496,7 @@
 					{
 						"title": "Search",
 						"layout": "row",
-						"show": [
+						"show_conditions": [
 							{
 								"arg1": {"key": "search_started", "fx": "value"},
 								"op": "==",
@@ -2536,7 +2603,7 @@
 					{
 						"title": "Summary of your search",
 						"layout": "row",
-						"show": [
+						"show_conditions": [
 							{
 								"arg1": {"key": "search_started", "fx": "value"},
 								"op": "==",
@@ -2572,7 +2639,7 @@
 				[
 					{
 						"title": "Results",
-						"show": [
+						"show_conditions": [
 							{
 								"arg1": {"key": "search_started", "fx": "value"},
 								"op": "==",
@@ -2897,7 +2964,7 @@
 					{
 						"title": "Search",
 						"layout": "row",
-						"show": [
+						"show_conditions": [
 							{
 								"arg1": {"key": "search_started", "fx": "value"},
 								"op": "==",
@@ -3005,7 +3072,7 @@
 					{
 						"title": "Summary of your search",
 						"layout": "row",
-						"show": [
+						"show_conditions": [
 							{
 								"arg1": {"key": "search_started", "fx": "value"},
 								"op": "==",
@@ -3041,7 +3108,7 @@
 				[
 					{
 						"title": "Results",
-						"show": [
+						"show_conditions": [
 							{
 								"arg1": {"key": "search_started", "fx": "value"},
 								"op": "==",
@@ -3368,7 +3435,7 @@
 						"title": "Search",
 						"width": "50",
 						"layout": "row",
-						"show": [
+						"show_conditions": [
 							{
 								"arg1": {"key": "search_started", "fx": "value"},
 								"op": "==",
@@ -3495,7 +3562,7 @@
 					{
 						"title": "Summary of your search",
 						"layout": "row",
-						"show": [
+						"show_conditions": [
 							{
 								"arg1": {"key": "search_started", "fx": "value"},
 								"op": "==",
@@ -3531,7 +3598,7 @@
 				[
 					{
 						"title": "Results",
-						"show": [
+						"show_conditions": [
 							{
 								"arg1": {"key": "search_started", "fx": "value"},
 								"op": "==",
@@ -3857,7 +3924,7 @@
 						"title": "Search",
 						"width": "50",
 						"layout": "row",
-						"show": [
+						"show_conditions": [
 							{
 								"arg1": {"key": "search_started", "fx": "value"},
 								"op": "==",
@@ -3983,7 +4050,7 @@
 					{
 						"title": "Summary of your search",
 						"layout": "row",
-						"show": [
+						"show_conditions": [
 							{
 								"arg1": {"key": "search_started", "fx": "value"},
 								"op": "==",
@@ -4019,7 +4086,7 @@
 				[
 					{
 						"title": "Results",
-						"show": [
+						"show_conditions": [
 							{
 								"arg1": {"key": "search_started", "fx": "value"},
 								"op": "==",
@@ -4344,7 +4411,7 @@
 						"title": "Search",
 						"width": "50",
 						"layout": "row",
-						"show": [
+						"show_conditions": [
 							{
 								"arg1": {"key": "search_started", "fx": "value"},
 								"op": "==",
@@ -4448,7 +4515,7 @@
 					{
 						"title": "Summary of your search",
 						"layout": "row",
-						"show": [
+						"show_conditions": [
 							{
 								"arg1": {"key": "search_started", "fx": "value"},
 								"op": "==",
@@ -4484,7 +4551,7 @@
 				[
 					{
 						"title": "Results",
-						"show": [
+						"show_conditions": [
 							{
 								"arg1": {"key": "search_started", "fx": "value"},
 								"op": "==",
@@ -4809,7 +4876,7 @@
 						"title": "Search",
 						"width": "50",
 						"layout": "row",
-						"show": [
+						"show_conditions": [
 							{
 								"arg1": {"key": "search_started", "fx": "value"},
 								"op": "==",
@@ -4891,7 +4958,7 @@
 					{
 						"title": "Summary of your search",
 						"layout": "row",
-						"show": [
+						"show_conditions": [
 							{
 								"arg1": {"key": "search_started", "fx": "value"},
 								"op": "==",
@@ -4927,7 +4994,7 @@
 				[
 					{
 						"title": "Results",
-						"show": [
+						"show_conditions": [
 							{
 								"arg1": {"key": "search_started", "fx": "value"},
 								"op": "==",
@@ -5252,7 +5319,7 @@
 						"title": "Search",
 						"width": "70",
 						"layout": "row",
-						"show": [
+						"show_conditions": [
 							{
 								"arg1": {"key": "search_started", "fx": "value"},
 								"op": "==",
@@ -5328,7 +5395,7 @@
 					{
 						"title": "Summary of your search",
 						"layout": "row",
-						"show": [
+						"show_conditions": [
 							{
 								"arg1": {"key": "search_started", "fx": "value"},
 								"op": "==",
@@ -5364,7 +5431,7 @@
 				[
 					{
 						"title": "Results",
-						"show": [
+						"show_conditions": [
 							{
 								"arg1": {"key": "search_started", "fx": "value"},
 								"op": "==",

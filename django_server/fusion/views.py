@@ -294,7 +294,9 @@ def search_for_chromosome2_private(request):
         
         total = len(fusions)
     
-    fusions = sorted(fusions, key=lambda fusion: fusion.num_algo, reverse=True)[data["offset"]:data["offset"]+data["limit"]]
+    fusions = sorted(fusions, key=lambda fusion: fusion.num_algo, reverse=True)
+    if "offset" in data:
+        fusions = fusions[data["offset"]:data["offset"]+data["limit"]]
     
     rows = build_rows2(fusions, c_line)
     
@@ -354,7 +356,11 @@ def search_for_gene2_private(request):
         fusions = filtered_fusions
     
     total = len(fusions)
-    fusions = sorted(fusions, key=lambda fusion: fusion.num_algo, reverse=True)[data["offset"]:data["offset"]+data["limit"]]
+    fusions = sorted(fusions, key=lambda fusion: fusion.num_algo, reverse=True)
+    
+    if "offset" in data:
+        fusions = fusions[data["offset"]:data["offset"]+data["limit"]]
+    
     rows = build_rows2(fusions, c_line)
 
     response = {"structure": {"field_list": get_header2()}, "total": total, "hits": rows}
@@ -437,7 +443,11 @@ def search_for_exon2_private(request):
         fusions = filtered_fusions
     
     total = len(fusions)
-    fusions = sorted(fusions, key=lambda fusion: fusion.num_algo, reverse=True)[data["offset"]:data["offset"]+data["limit"]]
+    fusions = sorted(fusions, key=lambda fusion: fusion.num_algo, reverse=True)
+    
+    if "offset" in data:
+        fusions = fusions[data["offset"]:data["offset"]+data["limit"]]
+        
     rows = build_rows2(fusions, c_line)
 
     response = {"structure": {"field_list": field_list}, "total": total, "hits": rows}
@@ -530,7 +540,11 @@ def search_for_transcript2_private(request):
         fusions = filtered_fusions
     
     total = len(fusions)
-    fusions = sorted(fusions, key=lambda fusion: fusion.num_algo, reverse=True)[data["offset"]:data["offset"]+data["limit"]]           
+    fusions = sorted(fusions, key=lambda fusion: fusion.num_algo, reverse=True)
+    
+    if "offset" in data:
+        fusions = fusions[data["offset"]:data["offset"]+data["limit"]]
+               
     rows = build_rows2(fusions, c_line)
 
     response = {"structure": {"field_list": get_header2()}, "total": total, "hits": rows}
@@ -542,7 +556,6 @@ def cell_lines(request):
     response = []
 
     for cell_line in CellLine.nodes.order_by("cell_line"):
-        print(cell_line)
         response.append({"id": cell_line.cell_line, "label": cell_line.name, "extra": cell_line.disease_name, "img": "cell-icon.png"})
     
     response = sorted(response, key=lambda cell: cell["label"]);
@@ -1170,7 +1183,7 @@ def get_ccle_infos():
         words[0] = words[0].replace("_", " ")
         disease_map[words[0]] = words[1]
         
-    print(disease_map)
+    #print(disease_map)
     
     map = {}
     txt_file = open(os.path.dirname(__file__) + "/ccle_ids.txt", "r")
@@ -1231,15 +1244,20 @@ def get_cell_line_from_disease(disease):
     
     return cls
 
-def diseases_simple(request):
+def diseases_simple(request, prefix = None):
     response = []
     
     disease_dict = {}
-
+    
     counter = Counter()
     for cell_line in CellLine.nodes:
-        disease_dict[cell_line.disease] = {"id": cell_line.disease, "label": cell_line.disease_name, "img": "disease-icon.png"}
-        counter[cell_line.disease] += 1
+        disease = cell_line.disease
+        disease_name = cell_line.disease_name
+        
+        if prefix is None or prefix.lower() not in disease_name.lower(): continue
+        
+        disease_dict[disease] = {"id": disease, "label": disease_name, "img": "disease-icon.png"}
+        counter[disease] += 1
         
     for disease in disease_dict.values():
         n = counter[disease["id"]]
@@ -1519,7 +1537,8 @@ def build_rows2(fusions, c_line = "ALL", include_FC_only = False):
         NA_object = {
                     "type": "text",
                     "label": "-",
-                    "color": "black"
+                    "color": "black",
+                    "title": "-"
                 }
         
         fc_flag = NA_object
@@ -2428,9 +2447,6 @@ def search_viruses2_private(request):
     
     print(data)
     
-    if not data:
-        data = {"offset": 0, "limit": 50}
-    
     field_list = [
         {
             "label": "cell_line",
@@ -2730,7 +2746,7 @@ def generate_statistics(request):
 #         writer.writerow([annotation, effects_counter[annotation]])
 #     file.close()
     
-#     # Distribution of description
+    # Distribution of description
 #     print("Producing statistics about Description/FusionCell")
 #     file =  open(os.path.dirname(__file__) + "/statistics/Description_FusionCell.csv", 'w')
 #     writer = csv.writer(file, lineterminator='\n')
@@ -2746,33 +2762,83 @@ def generate_statistics(request):
 #             annotations = event.annotations
 #             if annotations is None: continue
 #             if len(annotations) == 0: continue
-#                
+#                 
 #             intersection = [x for x in annotations if x in tags_of_interest]
 #             if not intersection: continue
-#                
+#                 
 #             for subset in chain.from_iterable(combinations(intersection,n) for n in range(1, len(intersection)+1)):
 #                 subset_string = "/".join(subset)
 #                 annotation_counter[subset_string] += 1
 #                 descriptions_in_green_list = filter(lambda x: x in green_list, subset)
 #                 descriptions_in_orange_list = filter(lambda x: x in orange_list, subset)
 #                 descriptions_in_red_list = filter(lambda x: x in red_list, subset)
-#                  
+#                   
 #                 subset_colors = Counter()
-#                  
+#                   
 #                 if len(descriptions_in_green_list) > 0:
 #                     subset_colors["green"] += len(descriptions_in_green_list)
 #                 if len(descriptions_in_orange_list) > 0:
 #                     subset_colors["orange"] += len(descriptions_in_orange_list)
 #                 if len(descriptions_in_red_list) > 0:
 #                     subset_colors["red"] += len(descriptions_in_red_list)
-#                  
+#                   
 #                 if len(subset_colors) == 1:
 #                     subset_color = subset_colors.most_common()[0][0]
 #                 elif len(subset_colors) > 1:
 #                     subset_color = "grey";
-#  
+#   
 #                 subsets_colors[subset_string] = subset_color
-#                  
+#                   
+#     for annotation in annotation_counter:
+#         writer.writerow([annotation, annotation_counter[annotation], subsets_colors[annotation]])
+#     file.close()
+    
+    
+        # Distribution of description
+#     print("Producing statistics about Description/FusionCell in the CCS")
+#     file =  open(os.path.dirname(__file__) + "/statistics/Description_FusionCell_CCS.csv", 'w')
+#     writer = csv.writer(file, lineterminator='\n')
+#     writer.writerow(["Description", "Number of fusion events in CCS", "Color"])
+#     tags_of_interest = ["chimerdb2", "cosmic", "tcga", "gtex", "oncogene", "ticdb"] 
+#     annotation_counter = Counter()
+#     step = 100000
+#     subsets_colors = {}
+#     total = len(FusionCell.nodes)
+#     for x in xrange(0, total, step):
+#         print("Loading all fusion cells between " + str(x) + " and " + str(x+step))
+#         for event in FusionCell.nodes[x:x+step]:
+#             if event.num_algo < 3: continue
+#             
+#             annotations = event.annotations
+#             if annotations is None: continue
+#             if len(annotations) == 0: continue
+#                 
+#             intersection = [x for x in annotations if x in tags_of_interest]
+#             if not intersection: continue
+#                 
+#             for subset in chain.from_iterable(combinations(intersection,n) for n in range(1, len(intersection)+1)):
+#                 subset_string = "/".join(subset)
+#                 annotation_counter[subset_string] += 1
+#                 descriptions_in_green_list = filter(lambda x: x in green_list, subset)
+#                 descriptions_in_orange_list = filter(lambda x: x in orange_list, subset)
+#                 descriptions_in_red_list = filter(lambda x: x in red_list, subset)
+#                   
+#                 subset_colors = Counter()
+#                   
+#                 if len(descriptions_in_green_list) > 0:
+#                     subset_colors["green"] += len(descriptions_in_green_list)
+#                 if len(descriptions_in_orange_list) > 0:
+#                     subset_colors["orange"] += len(descriptions_in_orange_list)
+#                 if len(descriptions_in_red_list) > 0:
+#                     subset_colors["red"] += len(descriptions_in_red_list)
+#                   
+#                 if len(subset_colors) == 1:
+#                     subset_color = subset_colors.most_common()[0][0]
+#                 elif len(subset_colors) > 1:
+#                     subset_color = "grey";
+#   
+#                 subsets_colors[subset_string] = subset_color
+#                   
 #     for annotation in annotation_counter:
 #         writer.writerow([annotation, annotation_counter[annotation], subsets_colors[annotation]])
 #     file.close()
@@ -2855,9 +2921,6 @@ def get_fusions2_private(request):
     
     print("get_fusions2_private", data)
     
-    if not data:
-        data = {"offset": 0, "limit": 50}
-
     fusions = []
     
     fusion_descriptions = fusion_descriptions_raw
@@ -3250,15 +3313,33 @@ def get_fusion_by_disease(request):
 
 def get_event_map(request):
     header = ["Type of event", "No. of fusion events"]
-    rows = [
-            [{"id": 0, "label": "False positives"}, 299],
-            [{"id": 1, "label": "True positives"}, 531],
-            [{"id": 2, "label": "False positives with medium probability"}, 32],
-            [{"id": 3, "label": "Novel candidates with ambiguous classification"}, 652],
-            [{"id": 4, "label": "Novel candidates"}, 1376]
-        ]
+    rows = []
+#     rows = [
+#             [{"id": 0, "label": "False positives"}, 299],
+#             [{"id": 1, "label": "True positives"}, 531],
+#             [{"id": 2, "label": "False positives with medium probability"}, 32],
+#             [{"id": 3, "label": "Novel candidates with ambiguous classification"}, 652],
+#             [{"id": 4, "label": "Novel candidates"}, 1376]
+#         ]
+
+    chart = Counter()
+    for fusion in FusionCell.nodes.filter(num_algo__exact = 3):
+        if fusion.gene_couple[0].cosmic: continue
+        
+        chart[fusion.quality] += 1
     
     colors = ["#CC0000", "#6AA84F", "#FF9900", "#CCCCCC", "#990099"]
+    
+    quality_map = {
+        'red': {"id": 0, "quality": "red", "label": "False positives"},
+        'green': {"id": 1, "quality": "green","label": "True positives"},
+        'orange': {"id": 2, "quality": "orange","label": "False positives with medium probability"},
+        'grey': {"id": 3, "quality": "grey","label": "Novel candidates with ambiguous classification"},
+        'N/A': {"id": 4, "quality": "N/A","label": "Novel candidates"}
+    }
+    
+    for quality in sorted(quality_map.values(), key=lambda x: x["id"]):
+        rows.append([quality, chart[quality["quality"]]])
     
     return HttpResponse(json.dumps({"header": header, "items": rows, "colors": colors}))
 
@@ -3432,7 +3513,7 @@ def cell_line_chromosome_info(request, cell_line):
     
     counter = Counter()
     rows = []
-    header = ["Chromosome", "No. of fusion events"]
+    header = ["Chromosomes", "No. of fusion events"]
     step = 100000
     fusion_cells = FusionCell.nodes.filter(cell_line = cell_line)
     for fusion in fusion_cells:
@@ -3451,7 +3532,7 @@ def cell_line_chromosome_info(request, cell_line):
     
     print("Building rows...")
     for pair in counter.most_common():
-        rows.append([{"title": "Chromosome", "label": pair[0]}, pair[1]])
+        rows.append([{"title": "Chromosome " + pair[0].replace("chr", ""), "value": "Number of gene fusion events", "label": pair[0]}, pair[1]])
     
     return HttpResponse(json.dumps({"header": header, "items": rows, "descriptions": header}))
 
@@ -3552,7 +3633,7 @@ def fusion_event_minor_info(request, fusion_id):
     algocode2string = {"ES": "EricScript", "FC": "FusionCatcher", "TH": "Tophat-Fusion"}
     algo_strings = [algocode2string[x] for x in fusion_event.algos]
     
-    fusioncatcher_button = None
+    fusioncatcher_button = {"type": "text", "data": {"value": "-"}}
     if "FC" in fusion_event.algos:
         fusioncatcher_button = {
                     "type": "button",
@@ -3578,7 +3659,7 @@ def fusion_event_minor_info(request, fusion_id):
                         }
                 }
         
-    ericscript_button = None
+    ericscript_button = {"type": "text", "data": {"value": "-"}}
     if "ES" in fusion_event.algos:
         ericscript_button = {
                     "type": "button",
@@ -3604,7 +3685,7 @@ def fusion_event_minor_info(request, fusion_id):
                         }
                 }
     
-    tophat_button = None
+    tophat_button = {"type": "text", "data": {"value": "-"}}
     if "TH" in fusion_event.algos:
         tophat_button = {
                     "type": "button",
@@ -3820,8 +3901,8 @@ def fusion_event_genes_info(request, fusion_id):
     gene_census2 = {"type": "linkable_image", "data": {"title": "See Census page for " + gene2.symbol, "width": "35px", "url": "census-icon.png", "link": "http://cancer.sanger.ac.uk/cosmic/census/"}} if gene2.census else {}
     gene_hallmark2 = {"type": "linkable_image", "data": {"title": "See Hallmark page for " + gene2.symbol, "width": "35px", "url": "hallmark-icon.png", "link": "http://cancer.sanger.ac.uk/cosmic/census-page/"+gene2.symbol}} if gene2.hallmark else {}
     
-    description1 = "<br/><b>Description</b>: " + gene1.description
-    description2 = "<br/><b>Description</b>: " + gene2.description
+    description1 = "<br/><b>Description</b>: " + (gene1.description if gene1.description is not None else "")
+    description2 = "<br/><b>Description</b>: " + (gene2.description if gene2.description is not None else "")
     
     rows.append([{
         "type": "multi",
@@ -4027,16 +4108,26 @@ def get_algorithms_statistics(request, algorithms):
 
     return HttpResponse(json.dumps(response))
 
-def get_external_database_statistics(request, databases):
+from distutils import util 
+def get_external_database_statistics(request, databases, ccs):
 
     header = []
     row = []
+    
+    print(ccs)
+    
+    if ccs is None: ccs = "False"
+    ccs = util.strtobool(ccs)
     
     requested_databases = databases.split("|")
     
     print(databases, requested_databases)
     
     filename = os.path.dirname(__file__) + "/statistics/Description_FusionCell.csv"
+    if ccs: filename = os.path.dirname(__file__) + "/statistics/Description_FusionCell_CCS.csv"
+    
+    print("Reading from filename", filename)
+    
     total = 0
     for line in open(filename, "r"):
         total += 1
@@ -4052,21 +4143,26 @@ def get_external_database_statistics(request, databases):
 
     return HttpResponse(json.dumps(response))
 
-def get_external_database_statistics_details(request, databases):
+def get_external_database_statistics_details(request, databases, ccs = False):
 
     header = ["Annotation", "Subset", "Cardinality"]
     rows = []
     
     requested_databases = databases.split("|")
     
-    print(databases, requested_databases)
+    # print(databases, requested_databases)
     color_messages = {
         "red": "False positive event with high probability",
         "orange": "False positive event with medium probability",
         "green": "True positive event with high probability",
         "grey": "Ambiguous event because tagged with positive and negative evidences"}
     
+    if ccs is None: ccs = "False"
+    ccs = util.strtobool(ccs)
+    
     filename = os.path.dirname(__file__) + "/statistics/Description_FusionCell.csv"
+    if ccs: filename = os.path.dirname(__file__) + "/statistics/Description_FusionCell_CCS.csv"
+    
     total = 0
     for line in open(filename, "r"):
         total += 1
@@ -4315,8 +4411,14 @@ def search_for_cell_line2_private(request, include_FC_only = False):
     return response
 
 def search_for_disease(request):
+    return HttpResponse(json.dumps(search_for_disease_private(request)))
+
+def search_for_disease_private(request):
+    
     data = json.loads(request.body)
     print(data)
+    
+#     if "disease" not in data: return {"structure": {"field_list": get_header2()}, "total": 0, "hits": []}
     
     disease = data["disease"]
     if disease == "ALL":
@@ -4324,14 +4426,13 @@ def search_for_disease(request):
     
     num_algorithms = data["num_algorithms"] if "num_algorithms" in data else 1
     
-    if not data:
-        data = {"offset": 0, "limit": 50}
-
     field_list = get_header2()
     
     fusions = []
     
     # Non cosmic + non in database e non verde/giallo/rosso
+    novel_path = ""
+    novel_condition = ""
     novel = data["novel"] if "novel" in data else False
     if novel == "strict":
         novel_condition = "NOT EXISTS(g.cosmic) AND f.quality = 'N/A' AND (NOT EXISTS(f.annotations) OR (" + " AND ".join(["NOT '"+x+"' IN f.annotations" for x in annotations.keys()]) + ")) AND"
@@ -4345,23 +4446,43 @@ def search_for_disease(request):
 #         total = len(fusions)
 #         fusions = fusions[data["offset"]:data["offset"]+data["limit"]]
 #     else:
-    r, m = db.cypher_query("MATCH "+novel_path+"(f:FusionCell)--(c:CellLine) WHERE "+novel_condition+" f.num_algo >= "+str(num_algorithms) +" AND c.disease = '"+disease+"' return count(distinct(f))")
+    count_query = "MATCH "+novel_path+"(f:FusionCell)--(c:CellLine) WHERE "+novel_condition+" f.num_algo >= "+str(num_algorithms) +" AND c.disease = '"+disease+"' return count(distinct(f))"
+    print(count_query)
+    r, m = db.cypher_query(count_query)
     total = r[0][0]
     
-    results, meta = db.cypher_query("MATCH "+novel_path+"(f:FusionCell)--(c:CellLine) WHERE "+novel_condition+" f.num_algo >= "+str(num_algorithms) +" AND c.disease = '"+disease+"' return distinct(f) ORDER BY f.num_algo DESC " + ("SKIP "+ str(data["offset"])+ " LIMIT " + str(data["limit"]) if "offset" in data else ""))
+    query = "MATCH "+novel_path+"(f:FusionCell)--(c:CellLine) WHERE "+novel_condition+" f.num_algo >= "+str(num_algorithms) +" AND c.disease = '"+disease+"' return distinct(f) ORDER BY f.num_algo DESC " + ("SKIP "+ str(data["offset"])+ " LIMIT " + str(data["limit"]) if "offset" in data else "")
+    print(query)
+    results, meta = db.cypher_query(query)
     fusions = [FusionCell.inflate(row[0]) for row in results]
 
-    print(len(fusions))
+    print("Fusions", len(fusions))
     rows = build_rows2(fusions)
-    print(len(rows))
+    print("Rows", len(rows))
     
-    response = {"structure": {"field_list": field_list}, "total": total, "hits": rows}
-    
-    return HttpResponse(json.dumps(response))
+    return {"structure": {"field_list": field_list}, "total": total, "hits": rows}
 
 from django.utils.encoding import smart_str
 from tempfile import NamedTemporaryFile
 from wsgiref.util import FileWrapper
+
+def download_disease(request):
+    print(request)
+    newfile = NamedTemporaryFile(mode="w+t", suffix='.txt')
+    print("Creating temporary file at " + str(newfile))
+    
+    data = search_for_disease_private(request)
+    
+    print(len(data["hits"]), data["total"])
+    for el in data["hits"]:
+        newfile.write(str(el) + os.linesep)
+    
+    newfile.seek(0)
+    data = {"filename": "disease_results.txt", "content": newfile.read()}
+    
+    response = HttpResponse(json.dumps(data))
+    
+    return response
 
 def download_cell_lines(request):
     print(request)
@@ -4459,7 +4580,7 @@ def download_algorithms(request):
     
     newfile = NamedTemporaryFile(suffix='.txt')
     
-    data = get_fusions_by_algorithm2_private(request)
+    data = search_by_algorithm_private(request)
     for el in data["hits"]:
         newfile.write(str(el) + "\n")
     

@@ -1,6 +1,10 @@
 app.controller("pageController", function($routeParams, $http, $window, $rootScope, $scope, $mdDialog, $timeout, $mdSidenav, $location, toaster, messageService, info, pageTitle, dataService, ngMeta) {
 
 	var self = this;
+	
+//	$rootScope.search_started = false;
+//	dataService.global["search_started"] = false;
+	dataService.global["search_started"] = undefined;
 
 	console.log("PAGE CONTROLLER", info, pageTitle, $routeParams);
 
@@ -139,6 +143,7 @@ app.controller("pageController", function($routeParams, $http, $window, $rootSco
 		url = item.url
 		console.log("Want to go to " + url);
 		dataService.global["search_started"] = undefined;
+//		$rootScope.search_started = undefined;
 
 		// Check if the url is a form name
 		var isForm = false;
@@ -168,7 +173,8 @@ app.controller("pageController", function($routeParams, $http, $window, $rootSco
 			if (canSee) {
 				$scope.pageTitle = "form";
 				console.log("Going to render form " + url);
-				$rootScope.search_started = false;
+//				$rootScope.search_started = false;
+//				dataService.global["search_started"] = false;
 
 				$scope.page = 'templates/form.html';
 				$scope.info.image.percentage_width = $scope.info.image.percentage_width_original / 2;
@@ -293,17 +299,18 @@ app.controller("pageController", function($routeParams, $http, $window, $rootSco
 //		}
 //	};
 
-	$rootScope.search_started = false;
-	$scope.send_query = function() {
-
-		$rootScope.search_started = true;
-		$scope.form.results = [];
-		console.log("Want to make a new search!");
-	};
-
-	$scope.show_form = function() {
-		$rootScope.search_started = false;
-	};
+//	$scope.send_query = function() {
+//
+////		$rootScope.search_started = true;
+//		dataService.global["search_started"] = true;
+//		$scope.form.results = [];
+//		console.log("Want to make a new search!");
+//	};
+//
+//	$scope.show_form = function() {
+////		$rootScope.search_started = false;
+//		dataService.global["search_started"] = true;
+//	};
 
 //	if (pageTitle != undefined)
 //		$scope.goTo({
