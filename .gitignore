@@ -3,3 +3,4 @@ bower_components/*
 django_server/fusion/statistics/*csv
 django_server/fusion/data/*.txt
 django_server/fusion/statistics/*
+/bin/

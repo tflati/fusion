@@ -63,6 +63,7 @@ class FusionPoint(StructuredNode):
     fusioncatcher_events = RelationshipTo('FusionCatcher', "WITH_FC_SCRIPT")
     ericscript_events = RelationshipTo('EricScript', "WITH_ERIC_SCRIPT")
     tophat_events = RelationshipTo('Tophat', "WITH_TOPHAT_SCRIPT")
+    jaffa_events = RelationshipTo('Jaffa', "WITH_JAFFA_SCRIPT")
     
 class Algorithm(StructuredNode):
     algorithm_id = StringProperty()
@@ -102,6 +103,8 @@ class Fusion(StructuredNode):
     
 class FusionCatcher(StructuredNode):
     fusioncatcher_id = StringProperty()
+    
+    quality = StringProperty()
     description = ArrayProperty()
     common_mapping_reads = IntegerProperty()
     spanning_pairs = IntegerProperty()
@@ -123,7 +126,6 @@ class FusionCatcher(StructuredNode):
     with_trans_couple = RelationshipTo('Couple', "WITH_TRANS_COUPLE")
     with_gene = RelationshipTo('Gene',"WITH")
     
-#     algorithm = RelationshipFrom('Algorithm', "WITH_FC_SCRIPT")
     fusion_point = RelationshipFrom('FusionPoint', "WITH_FC_SCRIPT")
     
 class EricScript(StructuredNode):
@@ -159,6 +161,26 @@ class Tophat(StructuredNode):
     
 #     algorithm = RelationshipFrom('Algorithm', "WITH_TOPHAT_SCRIPT")
     fusion_point = RelationshipFrom('FusionPoint', "WITH_TOPHAT_SCRIPT")
+
+class Jaffa(StructuredNode):
+    jaffa_id = IntegerProperty()
+    transcript = StringProperty()
+    spanning_pairs = IntegerProperty()
+    spanning_reads = IntegerProperty()
+    chrom1 = StringProperty()
+    base1 = IntegerProperty()
+    strand1 = StringProperty()
+    chrom2 = StringProperty()
+    base2 = IntegerProperty()
+    strand2 = StringProperty()
+    inframe = BooleanProperty()
+    fusion_genes = StringProperty()
+    known = BooleanProperty()
+    classification = StringProperty()
+    sequence = StringProperty()
+    cell_line = StringProperty()
+    
+    fusion_point = RelationshipFrom('FusionPoint', "WITH_JAFFA_SCRIPT")
 
 class Gene(StructuredNode):
     ensid = StringProperty()

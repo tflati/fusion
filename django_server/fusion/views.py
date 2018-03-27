@@ -490,11 +490,10 @@ def search_for_transcript2_private(request):
         if t1 is not None:            
             for couple in t1.to_couple:
                 for fcfusion in couple.fusioncatcher_events:
-                    for algorithm in fcfusion.algorithm:
-                        for fusion_point in algorithm.fusion_points:
-                            for fusion in fusion_point.fusion_cells:
-                                if c_line == "ALL" or fusion.cell_line == c_line:
-                                    fusions_dict[fusion.fusion_cell_id] = fusion
+                    for fusion_point in algorithm.fusion_point:
+                        for fusion in fusion_point.fusion_cells:
+                            if c_line == "ALL" or fusion.cell_line == c_line:
+                                fusions_dict[fusion.fusion_cell_id] = fusion
                                     
     elif transcript_one == "ALL" and transcript_two != "ALL":
         
@@ -507,11 +506,10 @@ def search_for_transcript2_private(request):
         if t2 is not None:   
             for couple in t2.from_couple:
                 for fcfusion in couple.fusioncatcher_events:
-                    for algorithm in fcfusion.algorithm:
-                        for fusion_point in algorithm.fusion_points:
-                            for fusion in fusion_point.fusion_cells:
-                                if c_line == "ALL" or fusion.cell_line == c_line:
-                                    fusions_dict[fusion.fusion_cell_id] = fusion
+                    for fusion_point in algorithm.fusion_point:
+                        for fusion in fusion_point.fusion_cells:
+                            if c_line == "ALL" or fusion.cell_line == c_line:
+                                fusions_dict[fusion.fusion_cell_id] = fusion
     
     elif transcript_one != "ALL" and transcript_two != "ALL":
         t1 = None
@@ -521,13 +519,12 @@ def search_for_transcript2_private(request):
             pass
         
         if t1 is not None:   
-            for couple in t2.to_couple:
+            for couple in t1.to_couple:
                 for fcfusion in couple.fusioncatcher_events:
-                    for algorithm in fcfusion.algorithm:
-                        for fusion_point in algorithm.fusion_points:
-                            for fusion in fusion_point.fusion_cells:
-                                if c_line == "ALL" or fusion.cell_line == c_line:
-                                    fusions_dict[fusion.fusion_cell_id] = fusion
+                    for fusion_point in fcfusion.fusion_point:
+                        for fusion in fusion_point.fusion_cells:
+                            if c_line == "ALL" or fusion.cell_line == c_line:
+                                fusions_dict[fusion.fusion_cell_id] = fusion
                                 
     fusions = fusions_dict.values()
     
@@ -1544,10 +1541,12 @@ def build_rows2(fusions, c_line = "ALL", include_FC_only = False):
         fc_flag = NA_object
         es_flag = NA_object
         th_flag = NA_object
+        ja_flag = NA_object
         
         fusioncatcher_events = "FC" in myfusion.algos
         ericscript_events = "ES" in myfusion.algos
         tophat_events = "TH" in myfusion.algos
+        jaffa_events = "JA" in myfusion.algos
         
 #         fusioncatcher_events = []
 #         ericscript_events = []
@@ -1637,6 +1636,30 @@ def build_rows2(fusions, c_line = "ALL", include_FC_only = False):
                     ]
                     }
             }
+            
+        if jaffa_events and not include_FC_only:
+            ja_flag = {
+                "type": "button",
+                "color": "chocolate",
+                "action": "window",
+                "title": "This fusion event is supported by Jaffa",
+                "items": [{
+                    "type": "text",
+                    "label": "JA"
+                }],
+                "card": {
+                    "title": "Detailed information given by Jaffa for gene pair: " + str(myfusion.gene1) + "/" + str(myfusion.gene2),
+                    "width": "100",
+                    "elements": [
+                            {
+                                    "type": "table",
+                                    "data": {
+                                            "url": "/fusion_api/fusion/jaffa/"+str(myfusion.fusion_cell_id) + "/" + str(myfusion.cell_line)
+                                    }
+                            }
+                    ]
+                    }
+            }
         
         is_gold_pair_element = {
                     "type": "text",
@@ -1701,6 +1724,18 @@ def build_rows2(fusions, c_line = "ALL", include_FC_only = False):
             
 #             for tag in fcfusion.description:
 #                 annotations_found.add(tag)
+        in_mitelman = "mitelman" in all_annotations
+        
+        is_mitelman_element = {}
+        if in_mitelman:
+            is_mitelman_element = {
+                "type": "image",
+                "img_src": "mitelman_logo.png",
+                "width": "30px",
+                "title": "This pair of genes is known to be in the Mitelman repository.",
+                "target": "_blank"
+            }
+
         # Check red list
         descriptions_in_red_list = filter(lambda x: x in red_list, all_annotations)
 #         print("\tRED:" + descriptions_in_red_list)
@@ -1811,6 +1846,19 @@ def build_rows2(fusions, c_line = "ALL", include_FC_only = False):
                         "img_src": "oncofuse-icon.png",
                         "width": "50px"
                      })
+                
+        ja_flag_final = copy.deepcopy(ja_flag)
+        if ja_flag:
+            if "#".join([myfusion.cell_line, myfusion.gene1, myfusion.gene2, "jaffa"]) in oncofuse_set:
+                #th_flag_final["type"] = "button"
+                ja_flag_final["title"] += ". It has also been validated by Oncofuse."
+                if "items" not in ja_flag_final: ja_flag_final["items"] = []
+                ja_flag_final["items"].append(
+                    {
+                        "type": "image",
+                        "img_src": "oncofuse-icon.png",
+                        "width": "50px"
+                     })
         
 #         fusion_id_object = {
 #                 "type": "image",
@@ -1853,12 +1901,14 @@ def build_rows2(fusions, c_line = "ALL", include_FC_only = False):
             "gene1": [gene1_object],
             "gene2": [gene2_object],
             "cosmic": [is_gold_pair_element],
+            "mitelman": [is_mitelman_element],
             "fusioncatcher": [fc_flag_final]
             }
         
         if not include_FC_only:
             single_row["ericscript"] = [es_flag_final]
             single_row["tophat_fusion"] = [th_flag_final]
+            single_row["jaffa"] = [ja_flag_final]
             
         rows.append(single_row)
         
@@ -1908,6 +1958,20 @@ def build_th_table(request, fus_id, c_line):
     response['details'] = {"header": header, "items": rows}
     return HttpResponse(json.dumps(response))
 
+
+def build_ja_table(request, fus_id, c_line):
+    
+    response = {}
+    # header = get_fc_header()
+    header = ["Jaffa information"]
+    
+#     fusions.append(Fusion.nodes.get(fusion_id = fus_id))
+    fusions = [FusionCell.nodes.get(fusion_cell_id = fus_id)]
+    
+    rows = build_ja_rows(fusions, c_line)
+    
+    response['details'] = {"header": header, "items": rows}
+    return HttpResponse(json.dumps(response))
 
 def build_fc_rows(fusions, cellLine):
     
@@ -2128,7 +2192,7 @@ def build_fc_rows(fusions, cellLine):
                         "type": "chip",
                         "value": algo,
                     })
-                
+                    
                 row.append({
                     "type": "multi",
                     "layout": "row",
@@ -2431,7 +2495,160 @@ def build_tophat_rows(fusions, cellLine):
                 rows.append(row)
 
     return rows
+
+def build_ja_rows(fusions, cellLine):
     
+    rows = []
+    ja_fusions = []
+    
+    print(cellLine)
+    print(len(fusions))
+
+#     for fus in fusions:
+#         for fcfusion in fus.with_fc_script:
+#             if fcfusion.toCellLine[0].cell_line == cellLine:
+#                 fc_fusions.append(fcfusion)
+            
+#     print("TOTAL " + str(len(fc_fusions)) + " FUSION CATCHER FUSIONS FOUND")
+
+    oncofuse = get_oncofuse_info_simple()
+    print(len(oncofuse))
+    oncofuse_set = set()
+    for item in oncofuse:
+        oncofuse_set.add("#".join(item))
+    
+    print(next(iter(oncofuse_set)))
+    
+    descriptions_counter = Counter()
+    tags_counter = Counter()
+    
+    for fusion in fusions:
+        gene1 = Gene.nodes.get(symbol=fusion.gene1)
+        gene2 = Gene.nodes.get(symbol=fusion.gene2)
+        
+        for fusion_point in fusion.fusion_points:
+            print(fusion_point)
+            
+            chromosome1 = Chromosome.nodes.get(chromosome__exact=fusion_point.chromosome1)
+            chromosome2 = Chromosome.nodes.get(chromosome__exact=fusion_point.chromosome2)
+            
+#             gene1 = chromosome1.of_gene[0]
+#             gene2 = chromosome2.of_gene[0]
+            
+            fusion_point_1 = fusion_point.breakpoint1
+            fusion_point_2 = fusion_point.breakpoint2
+            
+            for myfusion in fusion_point.jaffa_events.filter(cell_line__exact=cellLine):
+                
+                strand_1 = myfusion.strand1
+                strand_2 = myfusion.strand2
+                
+                in_oncofuse_ja = "#".join([cellLine, gene1.symbol, gene2.symbol, "jaffa"]) in oncofuse_set
+                oncofuse_object = {"type": "paragraph", "data": {"value": "<b>Oncofuse</b>: No Oncofuse data available for this event"}}
+                if in_oncofuse_ja:
+                    oncofuse_object = {
+                        "type": "multi",
+                        "subdata":[
+                            {
+                                "type": "paragraph",
+                                "data": {"value": "<b>Oncofuse data</b>"}
+                            },
+                            { "type": "button", "color": "lightsteelblue", "action": "window", "label": "See Oncofuse data", "card": {
+                                "title": "Detailed Oncofuse information",
+                                "width": "100",
+                                "elements": [
+                                        {
+                                                "type": "table",
+                                                "data": {
+                                                        "url": "/fusion_api/fusion/oncofuse/"+str(cellLine)+"/jaffa/"+gene1.symbol+"|"+gene2.symbol
+                                                }
+                                        }
+                                ]
+                            }}
+                        ]
+                     }
+                
+                row = []
+                row.append({
+                        "type": "multi",
+                        "subdata": [
+                            {
+                                "type": "image",
+                                "data": {
+                                        "url": "https://d30y9cdsu7xlg0.cloudfront.net/png/43386-200.png",
+                                        "width": "50px",
+                                    }
+                            },
+                            {"type": "paragraph", "data": {"value": "<b>5' position</b>: " + "chr"+ chromosome1.chromosome+":"+str(fusion_point_1)+":"+strand_1}}
+                        ]
+                        })
+                row.append({"type": "spacer"})
+                row.append({
+                        "type": "multi",
+                        "subdata": [
+                            {
+                                "type": "image",
+                                "data": {
+                                        "url": "https://d30y9cdsu7xlg0.cloudfront.net/png/43386-200.png",
+                                        "width": "50px",
+                                    }
+                            },
+                            {"type": "paragraph", "data": {"value": "<b>3' position</b>: " + "chr"+ chromosome2.chromosome+":"+str(fusion_point_2)+":"+strand_2}}
+                        ]
+                        })
+                
+                row.append({"type": "spacer"})
+                row.append({"type": "spacer"})
+                
+                row.append(oncofuse_object)
+                
+                row.append({"type": "paragraph", "data": {"value": "<b>Spanning pairs</b>: " + str(myfusion.spanning_pairs)}})
+                row.append({"type": "paragraph", "data": {"value": "<b>Spanning pairs (unique)</b>: " + str(myfusion.spanning_reads)}})
+                row.append({"type": "spacer"})
+                
+                row.append({
+                        "type": "multi",
+                        "layout": "row",
+                        "align": "start center",
+                        "subdata":[
+                            {"type": "paragraph", "data": {"value": "<b>Inframe</b>:"}},
+                            {"type": "chips", "items": [{
+                                "type": "chip",
+                                "value": str(myfusion.inframe),
+                                "color": "white",
+                                "background_color": "green" if str(myfusion.inframe) == "True" else "red"
+                            }]}
+                        ]
+                    })
+                row.append({
+                        "type": "multi",
+                        "layout": "row",
+                        "align": "start center",
+                        "subdata":[
+                            {"type": "paragraph", "data": {"value": "<b>Known (Mitelman)</b>:"}},
+                            {"type": "chips", "items": [{
+                                "type": "chip",
+                                "value": str(myfusion.known),
+                                "color": "white",
+                                "background_color": "green" if str(myfusion.known) == "True" else "red"
+                            }]}
+                        ]
+                    })
+                row.append({"type": "paragraph", "data": {"value": "<b>Classification</b>: " + str(myfusion.classification)}})
+                
+                sequence_object = {
+                            "type": "paragraph", "data": {"value": "<img width='50px' src='http://www.bioscience.co.uk/userfiles/icons/Molecular%20Biology.png'><b>Fusion sequence</b>:<span>" + myfusion.sequence + "</span>"}
+                        }
+                row.append(sequence_object)
+                row.append({"type": "spacer"})
+                
+                rows.append([{
+                        "type": "multi",
+                        "subdata": row
+                    }])
+    
+    print("FINISHED BUILD JAFFA ROWS")
+    return rows
 
 def search_viruses2(request):
     
@@ -2621,7 +2838,7 @@ def search_viruses2_private(request):
 from itertools import chain, combinations
 def generate_statistics(request):
     
-    # Chromosome
+#     # Chromosome
 #     print("Producing statistics about Chromosome/FusionCell")
 #     file =  open(os.path.dirname(__file__) + "/statistics/Chromosome_FusionCell.csv", 'w')
 #     writer = csv.writer(file, lineterminator='\n')
@@ -2633,7 +2850,7 @@ def generate_statistics(request):
 #         total = five_prime_events + three_prime_events
 #         writer.writerow([chromosome.chromosome, total])
 #     file.close()
- 
+#  
 #     # Chromosome/CellLine
 #     print("Producing statistics about Chromosome/CellLine")
 #     file =  open(os.path.dirname(__file__) + "/statistics/Chromosome_CellLine.csv", 'w')
@@ -2648,7 +2865,7 @@ def generate_statistics(request):
 #                     cell_lines.add(event.cell_line)
 #         writer.writerow([chromosome.chromosome, len(cell_lines)])
 #     file.close()
-
+# 
 #     print("Producing statistics about Chromosome/Gene")
 #     file =  open(os.path.dirname(__file__) + "/statistics/Chromosome_Gene.csv", 'w')
 #     writer = csv.writer(file, lineterminator='\n')
@@ -2659,7 +2876,7 @@ def generate_statistics(request):
 #         for gene in chromosome.of_gene: genes.add(gene.symbol)
 #         writer.writerow([chromosome.chromosome, len(genes)])
 #     file.close()
-
+# 
 #     # CellLine
 #     print("Producing statistics about CellLine/FusionCell")
 #     file =  open(os.path.dirname(__file__) + "/statistics/CellLine_FusionCell.csv", 'w')
@@ -2670,7 +2887,7 @@ def generate_statistics(request):
 #         writer.writerow([cell.cell_line, len(cell.happen)])
 #     file.close()      
 
-#     # Disease/Virus
+    # Disease/Virus
 #     print("Producing statistics about Disease/Virus")
 #     file =  open(os.path.dirname(__file__) + "/statistics/Disease_Virus.csv", 'w')
 #     writer = csv.writer(file, lineterminator='\n')
@@ -2685,7 +2902,7 @@ def generate_statistics(request):
 #         writer.writerow([disease, len(disease_viruses[disease])])
 #     file.close()
 
-#     # Disease/FusionCell
+    # Disease/FusionCell
 #     print("Producing statistics about Disease/FusionCell")
 #     file =  open(os.path.dirname(__file__) + "/statistics/Disease_FusionCell.csv", 'w')
 #     writer = csv.writer(file, lineterminator='\n')
@@ -2729,7 +2946,7 @@ def generate_statistics(request):
 #         writer.writerow([disease, disease_counter[disease]])
 #     file.close()
     
-#     # Distribution of predicted effect
+    # Distribution of predicted effect
 #     print("Producing statistics about PredictedEffect/FusionCell")
 #     file =  open(os.path.dirname(__file__) + "/statistics/PredictedEffect_FusionCell.csv", 'w')
 #     writer = csv.writer(file, lineterminator='\n')
@@ -2751,7 +2968,7 @@ def generate_statistics(request):
 #     file =  open(os.path.dirname(__file__) + "/statistics/Description_FusionCell.csv", 'w')
 #     writer = csv.writer(file, lineterminator='\n')
 #     writer.writerow(["Description", "Number of fusion events", "Color"])
-#     tags_of_interest = ["chimerdb2", "cosmic", "tcga", "gtex", "oncogene", "ticdb"] 
+#     tags_of_interest = ["chimerdb2", "cosmic", "tcga", "gtex", "oncogene", "ticdb", "mitelman"] 
 #     annotation_counter = Counter()
 #     step = 100000
 #     subsets_colors = {}
@@ -2762,33 +2979,33 @@ def generate_statistics(request):
 #             annotations = event.annotations
 #             if annotations is None: continue
 #             if len(annotations) == 0: continue
-#                 
+#                  
 #             intersection = [x for x in annotations if x in tags_of_interest]
 #             if not intersection: continue
-#                 
+#                  
 #             for subset in chain.from_iterable(combinations(intersection,n) for n in range(1, len(intersection)+1)):
 #                 subset_string = "/".join(subset)
 #                 annotation_counter[subset_string] += 1
 #                 descriptions_in_green_list = filter(lambda x: x in green_list, subset)
 #                 descriptions_in_orange_list = filter(lambda x: x in orange_list, subset)
 #                 descriptions_in_red_list = filter(lambda x: x in red_list, subset)
-#                   
+#                    
 #                 subset_colors = Counter()
-#                   
+#                    
 #                 if len(descriptions_in_green_list) > 0:
 #                     subset_colors["green"] += len(descriptions_in_green_list)
 #                 if len(descriptions_in_orange_list) > 0:
 #                     subset_colors["orange"] += len(descriptions_in_orange_list)
 #                 if len(descriptions_in_red_list) > 0:
 #                     subset_colors["red"] += len(descriptions_in_red_list)
-#                   
+#                    
 #                 if len(subset_colors) == 1:
 #                     subset_color = subset_colors.most_common()[0][0]
 #                 elif len(subset_colors) > 1:
 #                     subset_color = "grey";
-#   
+#    
 #                 subsets_colors[subset_string] = subset_color
-#                   
+#                    
 #     for annotation in annotation_counter:
 #         writer.writerow([annotation, annotation_counter[annotation], subsets_colors[annotation]])
 #     file.close()
@@ -2799,7 +3016,7 @@ def generate_statistics(request):
 #     file =  open(os.path.dirname(__file__) + "/statistics/Description_FusionCell_CCS.csv", 'w')
 #     writer = csv.writer(file, lineterminator='\n')
 #     writer.writerow(["Description", "Number of fusion events in CCS", "Color"])
-#     tags_of_interest = ["chimerdb2", "cosmic", "tcga", "gtex", "oncogene", "ticdb"] 
+#     tags_of_interest = ["chimerdb2", "cosmic", "tcga", "gtex", "oncogene", "ticdb", "mitelman"] 
 #     annotation_counter = Counter()
 #     step = 100000
 #     subsets_colors = {}
@@ -2808,37 +3025,37 @@ def generate_statistics(request):
 #         print("Loading all fusion cells between " + str(x) + " and " + str(x+step))
 #         for event in FusionCell.nodes[x:x+step]:
 #             if event.num_algo < 3: continue
-#             
+#              
 #             annotations = event.annotations
 #             if annotations is None: continue
 #             if len(annotations) == 0: continue
-#                 
+#                  
 #             intersection = [x for x in annotations if x in tags_of_interest]
 #             if not intersection: continue
-#                 
+#                  
 #             for subset in chain.from_iterable(combinations(intersection,n) for n in range(1, len(intersection)+1)):
 #                 subset_string = "/".join(subset)
 #                 annotation_counter[subset_string] += 1
 #                 descriptions_in_green_list = filter(lambda x: x in green_list, subset)
 #                 descriptions_in_orange_list = filter(lambda x: x in orange_list, subset)
 #                 descriptions_in_red_list = filter(lambda x: x in red_list, subset)
-#                   
+#                    
 #                 subset_colors = Counter()
-#                   
+#                    
 #                 if len(descriptions_in_green_list) > 0:
 #                     subset_colors["green"] += len(descriptions_in_green_list)
 #                 if len(descriptions_in_orange_list) > 0:
 #                     subset_colors["orange"] += len(descriptions_in_orange_list)
 #                 if len(descriptions_in_red_list) > 0:
 #                     subset_colors["red"] += len(descriptions_in_red_list)
-#                   
+#                    
 #                 if len(subset_colors) == 1:
 #                     subset_color = subset_colors.most_common()[0][0]
 #                 elif len(subset_colors) > 1:
 #                     subset_color = "grey";
-#   
+#    
 #                 subsets_colors[subset_string] = subset_color
-#                   
+#                    
 #     for annotation in annotation_counter:
 #         writer.writerow([annotation, annotation_counter[annotation], subsets_colors[annotation]])
 #     file.close()
@@ -2894,7 +3111,7 @@ def get_algorithms(request):
     
     response = []
     
-    labels = ["FusionCatcher", "Tophat-Fusion", "EricScript"]
+    labels = ["FusionCatcher", "Tophat-Fusion", "EricScript", "Jaffa"]
     
     for label in labels:
         item = {"label": label, "id": label}
@@ -2970,7 +3187,7 @@ def get_fusions2_private(request):
     print("BUILDING ROWS FOR " + str(len(fusions)) + " *** Taking in consideration only FC ***")
 
     rows = build_rows2(fusions, c_line, True)
-    header = get_header2()[:-2]
+    header = get_header2()[:-3]
     
     response = {"structure": {"field_list": header}, "total": total, "hits": rows}
     
@@ -3008,9 +3225,9 @@ def search_by_algorithm_private(request):
         novel_path = ""
     
     where_conditions = []
-    all_algorithms = ["FC", "ES", "TH"]
+    all_algorithms = ["FC", "ES", "TH", "JA"]
     for algo in all_algorithms:
-        algorithm_name = "FusionCatcher" if algo == "FC" else "EricScript" if algo == "ES" else "Tophat-Fusion"
+        algorithm_name = "FusionCatcher" if algo == "FC" else "EricScript" if algo == "ES" else "Tophat-Fusion" if algo == "TH" else "Jaffa" if algo == "JA" else "Unknown"
         print(algorithms, algorithm_name, algorithm_name in algorithms)
         
         if algorithm_name in algorithms:            
@@ -4049,6 +4266,7 @@ def get_algorithms_statistics(request, algorithms):
     map["FusionCatcher"] = "FC"
     map["EricScript"] = "ES"
     map["Tophat-Fusion"] = "TH"
+    map["Jaffa"] = "JA"
     
     inv_map = {v: k for k, v in map.iteritems()}
     
@@ -4084,7 +4302,7 @@ def get_algorithms_statistics(request, algorithms):
         for algo in intersection:
             intersection_string_array.append(inv_map[algo])
         
-        for subset in reduce(lambda result, x: result + [subset + [x] for subset in result], intersection_string_array, [[]]):
+        for subset in reduce(lambda result, x: result + [sorted(subset + [x]) for subset in result], intersection_string_array, [[]]):
             if len(subset) == 0: continue
             counter[INTERSECTION_SYMBOL.join(subset)] += n
         
@@ -4288,6 +4506,25 @@ def get_header2():
             }
         },
         {
+            "label": "mitelman",
+            "title": "Mitelman",
+            "width": "30px",
+            "tooltip": "Known fusion couple in Mitelman Catalogue",
+            "filters": {
+                "title": "Mitelman filters",
+                "list": [
+                    {
+                        "type": "checkbox",
+                        "key": "mitelman",
+                        "title": "Include results with Mitelman",
+                        "placeholder": "",
+                        "operators": "LIKE",
+                        "chosen_value": ""
+                    }
+                ]                
+            }
+        },
+        {
             "label": "fusioncatcher",
             "title": "FusionCatcher",
             "tooltip": "FusionCatcher algorithm",
@@ -4334,6 +4571,24 @@ def get_header2():
                         "type": "checkbox",
                         "key": "tophat_fusion",
                         "title": "Include results with Tophat-Fusion",
+                        "placeholder": "",
+                        "operators": "LIKE",
+                        "chosen_value": ""
+                    }
+                ]                
+            }
+        },
+        {
+            "label": "jaffa",
+            "title": "Jaffa",
+            "tooltip": "Jaffa algorithm",
+            "filters": {
+                "title": "Jaffa filters",
+                "list": [
+                    {
+                        "type": "checkbox",
+                        "key": "jaffa",
+                        "title": "Include results with Jaffa",
                         "placeholder": "",
                         "operators": "LIKE",
                         "chosen_value": ""
@@ -4397,7 +4652,7 @@ def search_for_cell_line2_private(request, include_FC_only = False):
         total = r[0][0]
 
         query = "MATCH "+novel_path+"(f:FusionCell)--(c:CellLine) WHERE "+novel_condition+" f.num_algo >= "+str(num_algorithms) +" AND c.cell_line = '"+c_line+"' return distinct(f) ORDER BY f.num_algo DESC " + ("SKIP "+ str(data["offset"])+ " LIMIT " + str(data["limit"]) if "offset" in data else "")
-        print(query)        
+        print(query)
         results, meta = db.cypher_query(query)
         fusions = [FusionCell.inflate(row[0]) for row in results]
 

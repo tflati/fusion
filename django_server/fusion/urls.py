@@ -56,6 +56,7 @@ urlpatterns = [
     url(r'^fusioncatcher/(.+)/(.+)/', views.build_fc_table, name='build_fc_table'),
     url(r'^ericscript/(.+)/(.+)/', views.build_es_table, name='build_es_table'),
     url(r'^tophat/(.+)/(.+)/', views.build_th_table, name='build_th_table'),
+    url(r'^jaffa/(.+)/(.+)/', views.build_ja_table, name='build_ja_table'),
     url(r'^mapping_algorithms/', views.get_mapping_algorithms, name='mapping_algorithms'),
     url(r'^fusion_descriptions/', views.get_fusion_descriptions, name='fusion_descriptions'),
     url(r'^predicted_effects/', views.get_predicted_effects, name='predicted_effects'),

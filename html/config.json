@@ -688,7 +688,7 @@
 								"subtype": "form",
 								"label": "Algorithms",
 								"data": {
-									"values": [{"label": "FusionCatcher", "checked": true}, {"label": "EricScript", "checked": true}, {"label": "Tophat-Fusion", "checked": true}],
+									"values": [{"label": "FusionCatcher", "checked": true}, {"label": "EricScript", "checked": true}, {"label": "Tophat-Fusion", "checked": true}, {"label": "Jaffa", "checked": true}],
 									"multiple": true,
 									"onClick": [{
 										"action": "write",
@@ -1633,11 +1633,14 @@
 								"type": "radio",
 								"subtype": "form",
 								"data": {
-									"value": "2",
+									"value": "4",
 									"values": [{
-										"label": "3 algorithms",
-										"value": 3,
+										"label": "4 algorithms",
+										"value": 4,
 										"selected": true
+									},{
+										"label": "3 algorithms",
+										"value": 3
 									}, {
 										"label": "2 algorithms",
 										"value": 2
@@ -2078,11 +2081,14 @@
 								"type": "radio",
 								"subtype": "form",
 								"data": {
-									"value": "2",
+									"value": "4",
 									"values": [{
-										"label": "3 algorithms",
-										"value": 3,
+										"label": "4 algorithms",
+										"value": 4,
 										"selected": true
+									},{
+										"label": "3 algorithms",
+										"value": 3
 									}, {
 										"label": "2 algorithms",
 										"value": 2
@@ -2545,11 +2551,14 @@
 								"type": "radio",
 								"subtype": "form",
 								"data": {
-									"value": "2",
+									"value": "4",
 									"values": [{
-										"label": "3 algorithms",
-										"value": 3,
+										"label": "4 algorithms",
+										"value": 4,
 										"selected": true
+									},{
+										"label": "3 algorithms",
+										"value": 3
 									}, {
 										"label": "2 algorithms",
 										"value": 2
@@ -3014,11 +3023,14 @@
 								"type": "radio",
 								"subtype": "form",
 								"data": {
-									"value": "2",
+									"value": "4",
 									"values": [{
-										"label": "3 algorithms",
-										"value": 3,
+										"label": "4 algorithms",
+										"value": 4,
 										"selected": true
+									},{
+										"label": "3 algorithms",
+										"value": 3
 									}, {
 										"label": "2 algorithms",
 										"value": 2
@@ -3485,11 +3497,14 @@
 								"type": "radio",
 								"subtype": "form",
 								"data": {
-									"value": "2",
+									"value": "4",
 									"values": [{
-										"label": "3 algorithms",
-										"value": 3,
+										"label": "4 algorithms",
+										"value": 4,
 										"selected": true
+									},{
+										"label": "3 algorithms",
+										"value": 3
 									}, {
 										"label": "2 algorithms",
 										"value": 2
@@ -3973,11 +3988,14 @@
 								"type": "radio",
 								"subtype": "form",
 								"data": {
-									"value": "2",
+									"value": "4",
 									"values": [{
-										"label": "3 algorithms",
-										"value": 3,
+										"label": "4 algorithms",
+										"value": 4,
 										"selected": true
+									},{
+										"label": "3 algorithms",
+										"value": 3
 									}, {
 										"label": "2 algorithms",
 										"value": 2
